@@ -84,10 +84,15 @@ header a {
 #i-am-wrap {
     float: left;
     padding-right: 10px;
+    margin-left: 20%;
 }
 
 #rotatey-text-wrap {
     float: left;
+}
+
+#rotate-title {
+    display: block;
 }
 
 /*Scrollbar Section */
