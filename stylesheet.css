@@ -136,7 +136,7 @@ header{
     padding: 15px 70px;
 }
 
-.scrollybar img:nth-child(3){
+.scrollybar img:nth-child(9){
     position: relative;
     top: -25px;
 }
@@ -187,4 +187,14 @@ header{
 
 #aboutme-text p {
     padding: 10px;
+}
+
+/* Skills Section */
+#skills-scroll img {
+    width: 150px;
+}
+
+#skills-scroll :nth-child(7){
+    position: relative;
+    top: -25px;
 }
