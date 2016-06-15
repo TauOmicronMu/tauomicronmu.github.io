@@ -57,68 +57,37 @@ nav {
 header{
     height: 500px;
     background-color: black;
-}
-#header-content-wrap{
-    width: 40%;
-    margin: auto;
+    color: #fff;
     text-align: center;
+    font-size: 24px;
+}
+
+header a {
+    color: #fff;
+    font-size: 25px;
+    padding: 5px;
+}
+
+#header-wrap {
+    text-align: center;
+    width: 40%;
     position: relative;
     top: 50%;
-    transform: translateY(-50%);
-    color: white;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }
 
-#header-content-wrap h2 {
-    margin: 0 auto;
+#header-wrap hr {
+    width: 25%;
 }
 
-#header-content-wrap hr{
-    width: 20%;
-    border: none;
-    height: 2px;
-    background-color: white;
-    margin-top: 20px;
-}
-
-#header-content-wrap span {
-    border-radius: 50px;
-    text-align: left;
-}
-
-#header-content-wrap i{
-    position: relative;
-    font-size: 30px;
-    padding: 10px;
-    transition: all 0.3s ease;
-    cursor: crosshair;
-}
-
-#header-content-wrap a {
-    color: #fff;
-}
-
-#header-content-wrap i:hover {
-    font-size: 50px;
-}
-#header-content-wrap h2{
-    font-family: 'Quicksand', 'sans-serif';
-    font-size: 35px;
-    width: 77%;
-}
-
-#rotatey-wrap {
-    text-align: center;
-}
-
-#iam {
+#i-am-wrap {
     float: left;
-    margin-left: 20%;
-    text-align: center;
+    padding-right: 10px;
 }
 
 #rotatey-text-wrap {
     float: left;
-    padding-left: 10px;
 }
 
 /*Scrollbar Section */
