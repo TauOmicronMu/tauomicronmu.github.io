@@ -68,6 +68,14 @@ header a {
     padding: 5px;
 }
 
+header i {
+    transition: all ease 0.3s;
+}
+
+header i:hover {
+    font-size: 50px;
+}
+
 #header-wrap {
     text-align: center;
     width: 40%;
