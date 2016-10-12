@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tom Goodman</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css">
+    <link type="text/css" rel="stylesheet" href="stylesheet.css"/>
+    <link href='https://fonts.googleapis.com/css?family=Quicksand:400,300,700' rel='stylesheet' type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.js"></script>
+    <link href="http://alexwiley.co.uk/js/simpletextrotator.css" type="text/css"/>
+    <script src="http://www.thepetedesign.com/demos/jquery.simple-text-rotator.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bxslider/4.2.5/jquery.bxslider.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bxslider/4.2.5/jquery.bxslider.css" type="text/css"></script>
+    <script src="http://alexwiley.co.uk/css/animate.css" type="text/css"></script>
+
+    <!-- http://ilikepixels.co.uk/drop/bubbler/ -->
+    <style>
+        .bubble
+        {
+            position: relative;
+            width: 250px;
+            height: 120px;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            background-image: linear-gradient(to right,#929292,#535353);
+            -webkit-border-radius: 31px;
+            -moz-border-radius: 31px;
+            border-radius: 31px;
+            border: #7F7F7F solid 10px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .bubble:after
+        {
+            content: '';
+            position: absolute;
+            border-style: solid;
+            border-width: 18px 27px 18px 0;
+            border-color: transparent #929292;
+            display: block;
+            width: 0;
+            z-index: 1;
+            margin-top: -18px;
+            left: -27px;
+            top: 41%;
+        }
+
+        .bubble:before
+        {
+            content: '';
+            position: absolute;
+            border-style: solid;
+            border-width: 27px 36px 27px 0;
+            border-color: transparent #7F7F7F;
+            display: block;
+            width: 0;
+            z-index: 0;
+            margin-top: -27px;
+            left: -46px;
+            top: 41%;
+        }
+    </style>
+</head>
+
+<body>
+<nav id="topbar">
+    <div id="nav-left">
+        <h1><span>Tom</span> Goodman</h1>
+    </div>
+    <div id="nav-right">
+        <div id="menuicons"></div>
+    </div>
+</nav>
+
+<header>
+    <div id="header-wrap">
+        <div id="rotate-title-wrap">
+            <h2 id="rotate-title">
+                <span id="i-am-wrap">
+                    I am a
+                </span>
+                <span id="rotatey-text-wrap">
+                    <span id="rotatey-text" class="rotate">
+                        Developer, Student, Designer, Musician
+                    </span>
+                </span>
+            </h2>
+            <br><br>
+            <hr>
+            <a href="https://twitter.com/tauomicronmu/"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            <a href="https://github.com/tauomicronmu"><i class="fa fa-github" aria-hidden="true"></i></a>
+            <a href="https://uk.linkedin.com/in/tagoodman"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</header>
+
+<section class="scrollybar">
+    <div style="text-align: center">
+        <ul class="bxslider">
+            <li><img src="img/jagex.png"/></li>
+            <li><img src="img/majestic.png"/></li>
+            <li><img src="img/uob.png"/></li>
+            <li><img src="img/css.png"/></li>
+            <!-- Put them here twice to make the slider smoother-->
+            <li><img src="img/jagex.png"/></li>
+            <li><img src="img/majestic.png"/></li>
+            <li><img src="img/uob.png"/></li>
+            <li><img src="img/css.png"/></li>
+        </ul>
+    </div>
+    <script>
+        $('.bxslider').bxSlider({
+            minSlides: 4,
+            maxSlides: 6,
+            slideWidth: 200,
+            slideMargin: 50,
+            ticker: true,
+            speed: 20000
+        });
+    </script>
+    <!--  <img src="img/css.png"/> -->
+</section>
+
+<section id="aboutme">
+    <div id="aboutme-wrap">
+        <h1 style="padding-top: 50px; padding-left: 20px;">About Me</h1>
+        <hr>
+        <div id="profile-image">
+            <img src="img/tom.png"/>
+        </div>
+        <div class="bubble" id="aboutme-text">
+            <p><span style="font-size:32px;"><i class="fa fa-quote-left" aria-hidden="true"></i></span> I'm Tom, and I'm a
+                developer, and student at the University of Birmingham. I am currently studying towards an MSci Computer
+                Science with Industrial Year Degree, and have just completed my first year with a first-class degree.</p>
+            <p>I have experience with Python, Java, JavaScript and OCaml, and I especially enjoy working on front-end
+                development with HTML, CSS and JavaScript.</p>
+            <p> Check out my CV <a href="CV.pdf" style="color:#fff">here</a>!</p>
+            <p>As well as this, I'm also a keen musician - predominantly a pianist and singer, although I have also dabbled
+                in guitar and flute.</p>
+            <p>Oh, and I game... A lot... Especially League of Legends.</p>
+            <p>I am currently the president of the Computer Science Society (CSS) at the University of Birmingham. As well
+                as this, I am a Silicon Canal ambassador, and I want to see Birmingham's tech scene become tighter-knit and less
+                fragmented.</p>
+            <p>I'm a big fan of coffee (I'm a developer and a student... what did you expect?) - and if you fancy grabbing a
+                coffee (or similar) in B'ham and chatting about tech etc. please get in touch!
+                <span style="font-size:32px;"><i class="fa fa-quote-right" aria-hidden="true"></i></span></p>
+        </div>
+    </div>
+</section>
+
+<section id="projects">
+    <h1 style="padding-top: 20px; padding-left: 20px;">Projects</h1>
+    <hr>
+    <div class="scrollybar">
+        <div style="text-align: center">
+            <ul class="bxslider">
+                <li><img src="img/aceofspades.png"/></li>
+                <li><img src="img/festiveometer.png"/></li>
+                <li><img src="img/geodonate.png"/></li>
+                <li><img src="img/tweat.png"/></li>
+                <li><img src="img/runetime.png"/></li>
+                <!-- Put them here twice to make the slider smoother-->
+                <li><img src="img/aceofspades.png"/></li>
+                <li><img src="img/festiveometer.png"/></li>
+                <li><img src="img/geodonate.png"/></li>
+                <li><img src="img/tweat.png"/></li>
+                <li><img src="img/runetime.png"/></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        $('.bxslider').bxSlider({
+            minSlides: 5,
+            maxSlides: 6,
+            slideWidth: 200,
+            slideMargin: 50,
+            ticker: true,
+            speed: 20000
+        });
+    </script>
+</section>
+
+<section id="skills">
+    <h1 style="padding-top: 20px; padding-left: 20px;">My Skills</h1>
+    <hr>
+    <div class="scrollybar">
+        <div style="text-align: center">
+            <ul class="bxslider" id="skills-scroll">
+                <li><img src="img/js.png"/></li>
+                <li><img src="img/java.png"/></li>
+                <li><img src="img/python.png"/></li>
+                <li><img src="img/ocaml.png"/></li>
+                <li><img src="img/latex.png"/></li>
+                <li><img src="img/csslang.png"/></li>
+                <li><img src="img/html.png"/></li>
+                <!-- Put them here twice to make the slider smoother-->
+                <li><img src="img/js.png"/></li>
+                <li><img src="img/java.png"/></li>
+                <li><img src="img/python.png"/></li>
+                <li><img src="img/ocaml.png"/></li>
+                <li><img src="img/latex.png"/></li>
+                <li><img src="img/csslang.png"/></li>
+                <li><img src="img/html.png"/></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        $('.bxslider').bxSlider({
+            minSlides: 6,
+            maxSlides: 7,
+            slideWidth: 200,
+            slideMargin: 50,
+            ticker: true,
+            speed: 20000
+        });
+    </script>
+</section>
+
+<script>
+    $(document).ready(function(){
+        $(".rotate").textrotator({
+            animation: "dissolve",
+            speed: 2000
+        });
+    });
+</script>
+
+</body>
+
+</html>
