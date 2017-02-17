@@ -10,6 +10,9 @@
       $(document).ready(function(){
          var items = ["CV.pdf"];
          
+         // Regex to split input into command and flags
+         var split_re = /(\s)*(\S*)(\s+[^-^\s])*(\s*)/
+
          // Regular expressions for the more complex commands
          var evince_re = /evince\s+(.*)\.pdf/;
          
@@ -21,20 +24,37 @@
              return true;
            },
            commandHandle:function(line){
+           // split the input into commands and flags
+           var split_line = line.split(split_re);           
+           if(split_line.length < 3) return [{msg:"tomsh: command not found",className:"jquery-console-message-value"}];
+           
+           // grab the command
+           var command = split_line[2];
+           console.log(command); 
+ 
+           // Now grab the flags
+           var flags = [];
+           // every 5th option from 2 is a flag (don't ask...)
+           for(var i = 7; i < split_line.length; i += 5) {
+               flags.push(split_line[i]);              
+           }
+	   console.log(flags);
+
            // exit
-               if(line == "exit") close(); 
-               if(line == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
+           if(command == "exit") close(); 
+           if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
            // ls
-               if(line == "ls") {
-                   var message = "";
-                   for(var i = 0; i < items.length; i++) {
-                       message += items[i] + " ";
-                   }
-                   return [{msg: message, className:"jquery-console-message-value"}];
+           if(command == "ls") {
+               var message = "";
+               for(var i = 0; i < items.length; i++) {
+                   message += items[i] + " ";
                }
+               return [{msg: message, className:"jquery-console-message-value"}];
+           }
            // evince 
+           
            // error
-               return [{msg:"tomsh: " + line + ": command not found",className:"jquery-console-message-value"}];
+           return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
 
            },
            autofocus:true,
