@@ -9,6 +9,10 @@
     <script type="text/javascript">
       $(document).ready(function(){
          var items = ["CV.pdf"];
+         
+         // Regular expressions for the more complex commands
+         var evince_re = /evince\s+(.*)\.pdf/;
+         
          var console1 = $('<div class="console1">');
          $('body').append(console1);
          var controller1 = console1.console({
@@ -17,17 +21,20 @@
              return true;
            },
            commandHandle:function(line){
-           // Handle the 'exit' command
+           // exit
                if(line == "exit") close(); 
                if(line == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
+           // ls
                if(line == "ls") {
                    var message = "";
                    for(var i = 0; i < items.length; i++) {
                        message += items[i] + " ";
                    }
-               return [{msg: message, className:"jquery-console-message-value"}];
+                   return [{msg: message, className:"jquery-console-message-value"}];
                }
-               return [{msg:"UNDER CONSTRUCTION - Check back soon! ~Tom",className:"jquery-console-message-value"}];
+           // evince 
+           // error
+               return [{msg:"Command not found.",className:"jquery-console-message-value"}];
 
            },
            autofocus:true,
