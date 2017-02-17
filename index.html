@@ -8,6 +8,7 @@
     <script type="text/javascript" src="jquery.console.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
+         var items = ["CV.pdf"];
          var console1 = $('<div class="console1">');
          $('body').append(console1);
          var controller1 = console1.console({
@@ -16,8 +17,16 @@
              return true;
            },
            commandHandle:function(line){
+           // Handle the 'exit' command
                if(line == "exit") close(); 
                if(line == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
+               if(line == "ls") {
+                   var message = "";
+                   for(var i = 0; i < items.length; i++) {
+                       message += items[i] + " ";
+                   }
+               return [{msg: message, className:"jquery-console-message-value"}];
+               }
                return [{msg:"UNDER CONSTRUCTION - Check back soon! ~Tom",className:"jquery-console-message-value"}];
 
            },
