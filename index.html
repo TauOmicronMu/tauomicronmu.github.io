@@ -11,13 +11,13 @@
          var console1 = $('<div class="console1">');
          $('body').append(console1);
          var controller1 = console1.console({
-           promptLabel: 'visitor@tomg.io:~ $ ',
+           promptLabel: 'visitor@tomg.io:~$ ',
            commandValidate:function(line){
              if (line == "") return false;
              else return true;
            },
            commandHandle:function(line){
-               return [{msg:"UNDER CONSTRUCTION - Check back soon! ~Tom x",className:"jquery-console-message-value"}];
+               return [{msg:"UNDER CONSTRUCTION - Check back soon! ~Tom",className:"jquery-console-message-value"}];
 
            },
            autofocus:true,
