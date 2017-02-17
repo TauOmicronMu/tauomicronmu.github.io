@@ -13,8 +13,7 @@
          var controller1 = console1.console({
            promptLabel: 'visitor@tomg.io:~$ ',
            commandValidate:function(line){
-             if (line == "") return false;
-             else return true;
+             return (line != "");
            },
            commandHandle:function(line){
                return [{msg:"UNDER CONSTRUCTION - Check back soon! ~Tom",className:"jquery-console-message-value"}];
