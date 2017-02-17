@@ -13,9 +13,11 @@
          var controller1 = console1.console({
            promptLabel: 'visitor@tomg.io:~$ ',
            commandValidate:function(line){
-             return (line != "");
+             return true;
            },
            commandHandle:function(line){
+               if(line == "exit") close(); 
+               if(line == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
                return [{msg:"UNDER CONSTRUCTION - Check back soon! ~Tom",className:"jquery-console-message-value"}];
 
            },
@@ -25,6 +27,7 @@
            });
         });
     </script>
+    
     <style>
       console1 {
         top: 0;
