@@ -1,75 +1,68 @@
-<!doctype html>
+<DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-  
-<head>
-      <link href='https://fonts.googleapis.com/css?family=Quicksand:400,300,700' rel='stylesheet' type='text/css'>
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css">
-      <style>
-        
-        body {
-          background-color: #dddddd;
-          height: 100%;
-          width: 100%;
-          padding: 0px;
-          margin: 0px;
-          color: #fff;
-          font-family: Quicksand, sans-serif;
-          background: url(img/cityscape.jpg) no-repeat center center fixed; 
-         -webkit-background-size: cover;
-          -moz-background-size: cover;
-          -o-background-size: cover;
-          background-size: cover;
-          text-align: center;
-        }
-        
-        h1 {
-          font-size: 3vw;
-        }
-       
-        h2 {
-          font-size: 2vw;
-          text-align: justified;
-          margin: auto;
-        }
-      
-        .hover-button {
-            color: #fff;
-            font-size: 2vw;
-            padding: 5px;
-         }
+  <head>
+    <title>Tom Goodman - @TauOmicronMu</title>
+    <meta name="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="jquery.console.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+         var console1 = $('<div class="console1">');
+         $('body').append(console1);
+         var controller1 = console1.console({
+           promptLabel: 'visitor@tomg.io:~ $ ',
+           commandValidate:function(line){
+             if (line == "") return false;
+             else return true;
+           },
+           commandHandle:function(line){
+               return [{msg:"UNDER CONSTRUCTION - Check back soon! ~Tom x",className:"jquery-console-message-value"}];
 
-        a {
-          color: #fff;
-        }
-        
-         body i {
-              transition: all ease 0.3s;
-         }
-
-         body i:hover {
-             font-size: 3vw;
-        
-        #about {
-          text-align: center !important;
-          width: 100%;
-        }
-      </style>
-</head>
-
+           },
+           autofocus:true,
+           animateScroll:true,
+           promptHistory:true,
+           });
+        });
+    </script>
+    <style>
+      console1 {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+    <style type="text/css" media="screen">
+      body {
+          top: 0;
+          left: 0;
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+      }
+      div.console1 { word-wrap: break-word; }
+      div.console1 { font-size: 14px }
+      div.console1 div.jquery-console-inner
+       { width:100vw; height:100vh; background:#333; padding:0.5em;
+         overflow:auto }
+      div.console1 div.jquery-console-prompt-box
+       { color:#fff; font-family:monospace; }
+      div.console1 div.jquery-console-focus span.jquery-console-cursor
+       { background:#fefefe; color:#333; font-weight:bold }
+      div.console1 div.jquery-console-message-error
+       { color:#ef0505; font-family:sans-serif; font-weight:bold;
+         padding:0.1em; }
+      div.console1 div.jquery-console-message-value
+       { color:#1ad027; font-family:monospace;
+         padding:0.1em; }
+      div.console1 div.jquery-console-message-type
+       { color:#52666f; font-family:monospace;
+         padding:0.1em; }
+      div.console1 span.jquery-console-prompt-label { font-weight:bold }
+    </style>
+  </head>
   <body>
-      <section id="about">
-            <h1>Tom Goodman 
-                <br>
-                <span style="color:#696A6F; font-size:2vw">Student, Developer Evangelist & Hackathon Organiser</span>
-            </h1>
-            <h2 style="width: 40%">
-              Hi, I'm Tom! I'm a student at the University of Birmingham and a Developer Evangelist. Check <a href="CV.pdf">here</a> for my CV, and click below for everything else!
-            </h2>
-            <h2>
-              <a class="hover-button" href="https://twitter.com/tauomicronmu/"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-              <a class="hover-button" href="https://github.com/tauomicronmu"><i class="fa fa-github" aria-hidden="true"></i></a>
-              <a class="hover-button" href="https://uk.linkedin.com/in/tagoodman"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-            </h2>
-      </section>
-</body>
+  </body>
 </html>
