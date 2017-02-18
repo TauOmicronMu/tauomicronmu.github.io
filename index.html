@@ -199,22 +199,22 @@
                    if(!contains(names ,args[i])) return invalid_filepath(command, args[i]);
                }
                // Open each file and concatenate them together
-               var result = "";
+               var message = "";
                for(var i = 0; i < args.length; i++) {
                    var xhttp = new XMLHttpRequest();
-                   xhttp.open("GET", args[i], true);
+                   xhttp.open("GET", args[i], false);
                    xhttp.onreadystatechange = function () {
-                       if(xhttp.readyState === 4) {
-                           if(xhttp.status === 200 || xhttp.status == 0) {
-                               result += xhttp.responseText;
+                       if(xhttp.readyState == 4) {
+                           if(xhttp.status == 200 || xhttp.status == 0) {
+                               message += xhttp.responseText;
                            }
                        }
                    }
                    xhttp.send(null);
                }
-
+               
                // Print the resulting string
-               return return_message(result);
+               return return_message(message);
            }
 
            // evince 
