@@ -57,7 +57,7 @@
          }
  
          var CV = new Item("CV.pdf", "149051");
-
+         var Contact = new Item("contact.txt", "370");
  
          // CONSTRUCT THE FILESYSTEM
          var home = new Item("~", true);
@@ -72,13 +72,15 @@
          // DEFINE ALL OF THE AVAILABLE COMMANDS
          const CMDS  = []     
 
+         const cat = new Cmd("cat", "concatenate files and print them to standard output");
          const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
          const exit   = new Cmd("exit", "close the tab\n usage: exit");
          const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
          const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
          const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
          const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
-     
+      
+         CMDS.push(cat);
          CMDS.push(evince);
          CMDS.push(exit);
          CMDS.push(groups);
@@ -158,6 +160,9 @@
 
           
            // DEFINE BEHAVIOUR OF EACH AVAILABLE COMMAND
+
+           // cat
+           //TODO: define cat!
 
            // evince 
            if(command == "evince") {
