@@ -8,8 +8,16 @@
     <script type="text/javascript" src="jquery.console.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
+         // Get current timestamp in correct format
+         function timestamp() {
+             var c_ts = (new Date(Date.now())).toString();
+             var c_ts_split = c_ts.split(" ");
+             return c_ts_split[1] + " " + c_ts_split[2] + " " + c_ts_split[4];    
+         }
+
+         
          // Prototype to handle items in the 'filesystem'
-         function Item(name, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = []) {
+         function Item(name, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [], ts=timestamp()) {
              this.name = name; // The identifier of the item
              this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
              this.owner = owner; // Who owns this item? (Defaults to tomg.io)
@@ -20,6 +28,7 @@
              this.other_a = other_a; // Other - defaults to 4
 
              this.items = items; // If this is a directory, it might contain other items...
+             this.ts = ts;
          }
          // Prototype to handle tomsh cmds
          function Cmd(name, help="there is no help text for this command" , man="there is no manual for this command") {
@@ -45,7 +54,7 @@
              "6" : "rw-", 
              "7" : "rwx"
          }
-
+ 
          var CV = new Item("CV.pdf");
 
  
@@ -233,7 +242,7 @@
                             message += item.owner + " ";
                             message += item.group + " ";
                             // TODO: Implement filesize and show it here
-                            // TODO: Implement timestamp and show it here
+                            message += item.ts + " ";
                             message += item.name;
                             message += "\n";
                        }
