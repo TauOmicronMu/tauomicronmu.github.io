@@ -62,11 +62,11 @@
          // DEFINE ALL OF THE AVAILABLE COMMANDS
          var CMDS  = []     
 
-         var evince = new Cmd("evince", "open a pdf file in a new tab");
-         var exit   = new Cmd("exit", "close the tab");
-         var groups = new Cmd("groups", "lists the groups that you belong to");
-         var help   = new Cmd("help");
-         var ls     = new Cmd("ls", "list all items in the current directory");
+         var evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
+         var exit   = new Cmd("exit", "close the tab\n usage: exit");
+         var groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
+         var help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
+         var ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
      
          CMDS.push(evince);
          CMDS.push(exit);
