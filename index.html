@@ -182,12 +182,12 @@
                return [{msg:msg,className:"jquery-console-message-value"}];
            }
 
-          
+           
            // DEFINE BEHAVIOUR OF EACH AVAILABLE COMMAND
 
            // cat
            //TODO: define cat!
-           if(command == "cat") {
+           function cat_c() { 
                // Check for no flags
                if(flags_b) return invalid_flags(command, flags);
                // Check # args - (must be > 0)
@@ -220,7 +220,7 @@
            }
 
            // evince 
-           if(command == "evince") {
+           function evince_c() {
 
                // Check the flags and do what they want
                if(flags_b) {
@@ -244,15 +244,15 @@
            } 
 
            // exit 
-           if(command == "exit") {
+           function exit_c() {
                if(flags_b) return invalid_flags(command, flags);
                if(args_b) return invalid_args_num(command, args.length, 0);
                close();
-           } 
-           if(command == "exit") return [{msg:"the exit command does not work with your browser",className:"jquery-console-message-value"}];
-
+               return [{msg:"the exit command does not work with your browser",className:"jquery-console-message-value"}];
+           }
+   
            // groups
-           if(command == "groups") {
+           function groups_c() {
                if(flags_b) return invalid_flags(command, flags);
                var message = "";
                var groups = users_groups[currentuser];
@@ -263,7 +263,7 @@
            }
            
            // help
-           if(command == "help") {
+           function help_c() {
                // If there are flags, throw the usual error
                if(flags_b) return invalid_flags(command, flags);
                var message = "";
@@ -289,7 +289,7 @@
            }
            
            // ls
-           if(command == "ls") {
+           function ls_c() {
                // Check the flags and do what they want
                if(flags_b) {
                    // -l flag : List access rights
@@ -327,9 +327,9 @@
            }
         
            // man
-           if(command == "man") {
+           function man_c() {
                if(flags_b) return invalid_flags(command, flags);
-               length = 0;
+               var length = 0;
                if(args_b) length = args.length;
                if(length != 1) return invalid_args_num(command, length, 1);
                for(var i = 0; i < CMDS.length; i++) {
@@ -338,7 +338,25 @@
                }
                return invalid_args(command, args);
            }
+           
+           // touch
+           function touch_c() {
+               if(flags_b) return invalid_flags(command, flags);
+               var length = 0;
+               if(args_b) length = args.length;
+               if(length != 1) return invalid_args_num(command, length, 1);
+               
+           }
  
+           // EXECUTE COMMANDS
+           if(command == "cat")    return cat_c();
+           if(command == "evince") return evince_c();
+           if(command == "exit")   return exit_c();
+           if(command == "groups") return groups_c();
+           if(command == "help")   return help_c();
+           if(command == "ls")     return ls_c();
+           if(command == "man")    return man_c();
+           if(command == "touch")  return touch_c(); 
            // catches any unknown commands
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
            },
