@@ -8,13 +8,46 @@
     <script type="text/javascript" src="jquery.console.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
-         var items = ["CV.pdf"];
-         var pdfs = ["CV.pdf"];
+         // Prototype to handle items in the 'filesystem'
+         function Item(name, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = []) {
+             this.name = name; // The identifier of the item
+             this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
+             this.owner = owner; // Who owns this item? (Defaults to tomg.io)
+             this.group = group; // What group does this item belong to? (Defaults to user) 
+             // Access perms... 
+             this.owner_a = owner_a; // Owner - defaults to 7 
+             this.group_a = group_a; // Group - defaults to 4
+             this.other_a = other_a; // Other - defaults to 4
+
+             this.items = items; // If this is a directory, it might contain other items...
+         }
+
+         // Mapping from access number to rwx combination
+         var access_map = {
+             "0" : "---",
+             "1" : "--x",
+             "2" : "-w-", 
+             "3" : "-wx", 
+             "4" : "r--", 
+             "5" : "r-x", 
+             "6" : "rw-", 
+             "7" : "rwx"
+         }
+
+         var CV = new Item("CV.pdf");
+ 
+         var home = new Item("~", true);
+         home.items.push(CV); // Put our CV in the home directory.
+  
+         // Keep track of which directory we're at! 
+         var currentdir = home;         
+
+         var pdfs = [CV];
  
          var cmds = ["ls", "evince", "exit"]  
          var cmds_desc = ["list all files in the current directory", "open a pdf file in a new tab", "close the tab"];  
      
-         // Regex to split input into command and flags
+         // Regex to split input into command, flags and args
          var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
         
          // Regex to split args 
@@ -81,17 +114,43 @@
            if(command == "ls") {
                // Check the flags and do what they want
                if(flags_b) {
+                   // TODO: Get the -l flag working w/ access rights
+                   if(flags == "-l") { 
+                       for(var i = 0; i < currentdir.items.length; i++) {
+                            var item = currentdir.items[i];
+                            var message = "";
+                            // Is it a directory?
+                            if(item.dir_b) message += "d";
+                            else message += "-";
+                            // Add on the 3 access perms
+                            message += access_map[item.owner_a];
+                            message += access_map[item.group_a];
+                            message += access_map[item.other_a];
+                            message += ". 1 "; // For now, it has 1 link as we don't have symbolic links.
+                            message += item.owner + " ";
+                            message += item.group + " ";
+                            // TODO: Implement filesize and show it here
+                            // TODO: Implement timestamp and show it here
+                            message += item.name;
+                            message += "\n";
+                       }
+                       return [{msg: message, className:"jquery-console-message-value"}];
+                   }
                    // For now, just say unrecognised option(s) + flag(s).
                    return [{msg: command + ": invalid option: " + flags, className:"jquery-console-message-value"}];  
                }
                var message = "";
-               for(var i = 0; i < items.length; i++) {
-                   message += items[i] + " ";
+               console.log(currentdir);
+               // For each item in the current directory...
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   // Concatenate it's name, followed by a space
+                   message += currentdir.items[i].name + " ";
                }
                return [{msg: message, className:"jquery-console-message-value"}];
            }
            // evince 
            if(command == "evince") {
+
                // Check the flags and do what they want
                if(flags_b) {
                    // There are no flags for "evince"...
