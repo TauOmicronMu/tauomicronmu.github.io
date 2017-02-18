@@ -265,7 +265,20 @@
                }
                return return_message(message);
            }
-         
+        
+           // man
+           if(command == "man") {
+               if(flags_b) return invalid_flags(command, flags);
+               length = 0;
+               if(args_b) length = args.length;
+               if(length != 1) return invalid_args_len(command, length, 1);
+               for(var i = 0; i < CMDS.length; i++) {
+                   var cmd = CMDS[i];
+                   if(cmd.name == args[0]) return return_message(cmd.man);
+               }
+               return invalid_args(command, args);
+           }
+ 
            // catches any unknown commands
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
            },
