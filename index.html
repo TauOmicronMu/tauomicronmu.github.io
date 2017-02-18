@@ -10,18 +10,6 @@
       $(document).ready(function(){
          const MAX_FILESIZE_LENGTH = 6;
 
-          function readTextFile(file){
-              var xhttp = new XMLHttpRequest();
-              xhttp.open("GET", file, false);
-              xhttp.onreadystatechange = function () {
-                  if(xhttp.readyState === 4) {
-                      if(xhttp.status === 200 || xhttp.status == 0) {
-                          console.log(xhttp);
-                          return xhttp.responseText;
-                      }
-                  }
-              }
-              xhttp.send(null);
          }
  
          // Get current timestamp in correct format
@@ -214,10 +202,17 @@
                }
                // Open each file and concatenate them together
                var result = "";
-               for(var i = 0; i < args.length; i++) {
-                   console.log(result);
-                   result += readTextFile(args[i]);
+               var xhttp = new XMLHttpRequest();
+               xhttp.open("GET", args[0], true);
+               xhttp.onreadystatechange = function () {
+                   if(xhttp.readyState === 4) {
+                       if(xhttp.status === 200 || xhttp.status == 0) {
+                           result += xhttp.responseText;
+                       }
+                   }
                }
+               xhttp.send(null);
+
                // Print the resulting string
                return return_message(result);
            }
