@@ -131,7 +131,12 @@
                if(flags_b) {
                    return invalid_flags(command, flags);
                }
-               
+               var message = "";
+               var groups = users_groups[currentuser];
+               for(var i = 0; i < groups.length; i++) {
+                   message += groups[i] + " ";    
+               }
+               return return_message(message);
            }
            // ls
            if(command == "ls") {
