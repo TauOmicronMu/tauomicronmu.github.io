@@ -200,16 +200,18 @@
                }
                // Open each file and concatenate them together
                var result = "";
-               var xhttp = new XMLHttpRequest();
-               xhttp.open("GET", args[0], true);
-               xhttp.onreadystatechange = function () {
-                   if(xhttp.readyState === 4) {
-                       if(xhttp.status === 200 || xhttp.status == 0) {
-                           result += xhttp.responseText;
+               for(var i = 0; i < args.length; i++) {
+                   var xhttp = new XMLHttpRequest();
+                   xhttp.open("GET", args[i], true);
+                   xhttp.onreadystatechange = function () {
+                       if(xhttp.readyState === 4) {
+                           if(xhttp.status === 200 || xhttp.status == 0) {
+                               result += xhttp.responseText;
+                           }
                        }
                    }
+                   xhttp.send(null);
                }
-               xhttp.send(null);
 
                // Print the resulting string
                return return_message(result);
@@ -327,7 +329,7 @@
                if(flags_b) return invalid_flags(command, flags);
                length = 0;
                if(args_b) length = args.length;
-               if(length != 1) return invalid_args_len(command, length, 1);
+               if(length != 1) return invalid_args_num(command, length, 1);
                for(var i = 0; i < CMDS.length; i++) {
                    var cmd = CMDS[i];
                    if(cmd.name == args[0]) return return_message(cmd.man);
