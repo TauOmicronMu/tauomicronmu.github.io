@@ -351,7 +351,14 @@
                var length = 0;
                if(args_b) length = args.length;
                if(length != 1) return invalid_args_num(command, length, 1);
-               // TODO: finish this off! 
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var item = currentdir.items[i];
+                   if(args[0] == item.name) {
+                       currentdir.items[i].ts = timestamp();
+                       return return_message("");
+                   }
+               }
+               return invalid_args(command, args[0]);
            }
  
            // EXECUTE COMMANDS
