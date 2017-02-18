@@ -61,8 +61,9 @@
  
          // CONSTRUCT THE FILESYSTEM
          var home = new Item("~", true);
+
          home.items.push(CV); // Put our CV in the home directory.
- 
+         home.items.push(Contact); // Put Contact.txt in the home directory.
          // Keep track of which directory we're at! 
          var currentdir = home;      
          // Keep track of the current user.   
