@@ -435,6 +435,7 @@
         inner.children(".jquery-console-prompt-box, .jquery-console-message").slice(0, -1).remove();
         extern.report(" ");
         extern.focus();
+        $("div.jquery-console-message").remove(); //~TauOmicronMu
     };
 
     function deleteNextWord() {

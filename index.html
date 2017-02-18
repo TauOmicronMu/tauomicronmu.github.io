@@ -85,7 +85,7 @@
          // DEFINE ALL OF THE AVAILABLE COMMANDS
          const CMDS  = []     
 
-         const cat = new Cmd("cat", "concatenate files and print them to standard output");
+         const cat = new Cmd("cat", "concatenate files and print them to standard output\n usage: cat <file 1> <file 2>...\n CURRENTLY IN DEVELOPMENT - NOT READY YET!");
          const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
          const exit   = new Cmd("exit", "close the tab\n usage: exit");
          const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
@@ -324,7 +324,7 @@
           overflow-x: hidden;
           overflow-y: hidden;
       }
-      div.console1 { white-space: pre;}
+      .jquery-console-inner .jquery-console-message { white-space: pre;}
       div.console1 { word-wrap: break-word; }
       div.console1 { font-size: 14px }
       div.console1 div.jquery-console-inner
