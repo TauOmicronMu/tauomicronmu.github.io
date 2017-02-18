@@ -17,7 +17,7 @@
                   if(xhttp.readyState === 4) {
                       if(xhttp.status === 200 || xhttp.status == 0) {
                           console.log(xhttp);
-                          return xhttp.response;
+                          return xhttp.responseText;
                       }
                   }
               }
@@ -214,8 +214,10 @@
                }
                // Open each file and concatenate them together
                var result = "";
-               for(var i = 0; i < args.length; i++) result += readTextFile(args[i]);
-            
+               for(var i = 0; i < args.length; i++) {
+                   console.log(result);
+                   result += readTextFile(args[i]);
+               }
                // Print the resulting string
                return return_message(result);
            }
