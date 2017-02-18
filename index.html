@@ -61,7 +61,7 @@
                // Check the flags and do what they want
                if(flags_b) {
                    // For now, just say unrecognised option(s) + flag(s).
-                   return [{msg: "tomsh: unrecognised option(s): " + flags, className:"jquery-console-message-value"}];  
+                   return [{msg: command + ": invalid option: " + flags, className:"jquery-console-message-value"}];  
                }
                var message = "";
                for(var i = 0; i < items.length; i++) {
