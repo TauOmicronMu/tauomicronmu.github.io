@@ -28,7 +28,6 @@
            // split the input into command, flags and args
            var split_line = line.split(split_re);           
            if(split_line == [""]) return [{msg:"tomsh: command not found",className:"jquery-console-message-value"}];
-           console.log(split_line);          
  
            // grab the command
            var command_b = false;
@@ -37,7 +36,6 @@
                command = split_line[1];
                command_b = true;
            }
-           console.log(command); 
  
            // Now grab the flags
            var flags_b = false;
@@ -46,7 +44,6 @@
                flags = split_line[2]; //TODO: Make this less naive
                flags_b = true;
 	   }
-           console.log("FLAGS: " + flags);
     
            // Now grab the args
            var args_b = false;
@@ -66,7 +63,6 @@
                }
                args_b = true;
            }
-           console.log(args);
            
            // exit
            if(command == "exit") close(); 
@@ -91,9 +87,8 @@
                    // There are no flags for "evince"...
                    return [{msg: command + ": invalid option: " + flags, className:"jquery-console-message-value"}];  
                }
-               var length = args.length;
-               if(args.length == undefined) length = 0;
-               console.log(length);
+               var length = 0;
+               if(args_b) length = args.length;
                if(length != 1) {
                    return [{msg: command + ": invalid number of arguments, "+ length + ", expected 1", className:"jquery-console-message-value"}]; 
                }
