@@ -22,6 +22,12 @@
              this.items = items; // If this is a directory, it might contain other items...
          }
 
+         // Mapping from users to an array of their groups
+         var users_groups = {
+             "visitor" : ["visitor", "user"],
+             "tomg.io" : ["owner", "user"]
+         }
+
          // Mapping from access number to rwx combination
          var access_map = {
              "0" : "---",
@@ -36,12 +42,16 @@
 
          var CV = new Item("CV.pdf");
  
+         // CONSTRUCT THE FILESYSTEM
          var home = new Item("~", true);
          home.items.push(CV); // Put our CV in the home directory.
   
          // Keep track of which directory we're at! 
-         var currentdir = home;         
- 
+         var currentdir = home;      
+         // Keep track of the current user.   
+         var currentuser = "visitor";
+        
+         // TODO keep a nice array of cmd objects instead! 
          var cmds = ["ls", "evince", "exit"]  
          var cmds_desc = ["list all files in the current directory", "open a pdf file in a new tab", "close the tab"];  
      
@@ -97,6 +107,14 @@
                }
                args_b = true;
            }
+
+           // Common error messages 
+           var invalid_flags = function(command, flags) {
+               return [{msg:command + ": invalid option: " + flags,className:"jquery-console-message-value"}];
+           }
+           var return_message = function(msg) {
+               return [{msg:msg,className:"jquery-console-message-value"}];
+           }
            
            // exit
            if(command == "help") {
@@ -104,15 +122,21 @@
                for(var i = 0; i < cmds.length; i++) { 
                    message += cmds[i] + " - " + cmds_desc[i] + "\n";
                }
-               return[{msg:message, className:"jquery-console-message-value"}];
+               return return_message(message);
            }
            if(command == "exit") close(); 
            if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
+           if(command == "groups") {
+               if(flags_b) {
+                   return invalid_flags(command, flags);
+               }
+               
+           }
            // ls
            if(command == "ls") {
                // Check the flags and do what they want
                if(flags_b) {
-                   // TODO: Get the -l flag working w/ access rights
+                   // -l flag : List access rights
                    if(flags == "-l") { 
                        for(var i = 0; i < currentdir.items.length; i++) {
                             var item = currentdir.items[i];
@@ -132,10 +156,10 @@
                             message += item.name;
                             message += "\n";
                        }
-                       return [{msg: message, className:"jquery-console-message-value"}];
+                       return return_message(message);
                    }
                    // For now, just say unrecognised option(s) + flag(s).
-                   return [{msg: command + ": invalid option: " + flags, className:"jquery-console-message-value"}];  
+                   return invalid_flags(command, flags)
                }
                var message = "";
                console.log(currentdir);
@@ -144,7 +168,7 @@
                    // Concatenate it's name, followed by a space
                    message += currentdir.items[i].name + " ";
                }
-               return [{msg: message, className:"jquery-console-message-value"}];
+               return return_message(message);
            }
            // evince 
            if(command == "evince") {
@@ -152,7 +176,7 @@
                // Check the flags and do what they want
                if(flags_b) {
                    // There are no flags for "evince"...
-                   return [{msg: command + ": invalid option: " + flags, className:"jquery-console-message-value"}];  
+                   return invalid_flags(command, flags);
                }
                var length = 0;
                if(args_b) length = args.length;
