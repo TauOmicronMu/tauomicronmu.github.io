@@ -10,6 +10,17 @@
       $(document).ready(function(){
          const MAX_FILESIZE_LENGTH = 6;
 
+         // Return whether or not a file is empty
+         function isEmpty(filename) {
+             for(var i = 0; i < currentdir.items.length; i++) {
+                 var item = currentdir.items[i];
+                 if(item.name == filename) {
+                     return item.empty;
+                 }
+             }
+             return true; // I guess?
+         }
+
          // Get current timestamp in correct format
          function timestamp() {
              var c_ts = (new Date(Date.now())).toString();
@@ -47,8 +58,9 @@
 
  
          // Prototype to handle items in the 'filesystem'
-         function Item(name, size=0, dir_b = false, owner = "tomg.io", group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
+         function Item(name, size=sizepad(0), empty=false, data="", dir_b = false, owner = "tomg.io", group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
              this.name = name; // The identifier of the item
+             this.empty = empty; 
              this.size = sizepad(size); // The size, in bytes, of the item
              this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
              this.owner = owner; // Who owns this item? (Defaults to tomg.io)
@@ -60,6 +72,8 @@
 
              this.items = items; // If this is a directory, it might contain other items...
              this.ts = ts;
+
+             this.data = data;
          }
          // Prototype to handle tomsh cmds
          function Cmd(name, help="there is no help text for this command" , man="there is no manual for this command") {
@@ -100,6 +114,8 @@
 
          // Keep track of which directory we're at! 
          var currentdir = home;      
+         // Keep track of the filepath too
+         var filepath = ["~"];
          // Keep track of the current user.   
          var currentuser = "visitor";
 
@@ -114,6 +130,7 @@
          const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
          const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
          const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
+         const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>\n STILL IN DEVELOPMENT - WILL NOT WORK!");
          const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
  
          CMDS.push(cat);
@@ -124,6 +141,7 @@
          CMDS.push(ls);
          CMDS.push(man);
          CMDS.push(touch);
+         CMDS.push(mkdir);
 
          // Regex to split input into command, flags and args
          var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
@@ -199,7 +217,6 @@
            // DEFINE BEHAVIOUR OF EACH AVAILABLE COMMAND
 
            // cat
-           //TODO: define cat!
            function cat_c() { 
                // Check for no flags
                if(flags_b) return invalid_flags(command, flags);
@@ -210,21 +227,25 @@
                for(var i = 0; i < args.length; i++) {
                    if(!contains(names ,args[i])) return invalid_filepath(command, args[i]);
                }
-               // Open each file and concatenate them together
                var message = "";
+               // Open each file and concatenate them together
                for(var i = 0; i < args.length; i++) {
-                   var xhttp = new XMLHttpRequest();
-                   xhttp.open("GET", args[i], false);
-                   xhttp.onreadystatechange = function () {
-                       if(xhttp.readyState == 4) {
-                           if(xhttp.status == 200 || xhttp.status == 0) {
-                               message += xhttp.responseText;
+                   if(isEmpty(args[i])) {
+                       message += "";
+                   }
+                   else {
+                       var xhttp = new XMLHttpRequest();
+                       xhttp.open("GET", args[i], false);
+                       xhttp.onreadystatechange = function () {
+                           if(xhttp.readyState == 4) {
+                               if(xhttp.status == 200 || xhttp.status == 0) {
+                                   message += xhttp.responseText;
+                               }
                            }
                        }
+                       xhttp.send(null);
                    }
-                   xhttp.send(null);
                }
-               
                // Print the resulting string
                return return_message(message);
            }
@@ -361,7 +382,9 @@
                        return return_message("");
                    }
                }
-               return invalid_args(command, args[0]);
+               // Create a blank file with the given name
+               currentdir.items.push(new Item(args[0], sizepad(0), true));
+               return return_message("");
            }
  
            // EXECUTE COMMANDS
