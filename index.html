@@ -21,6 +21,12 @@
 
              this.items = items; // If this is a directory, it might contain other items...
          }
+         // Prototype to handle tomsh cmds
+         function Cmd(name, help="there is no help text for this command" , man="there is no manual for this command") {
+             this.name = name; // Identifier of the cmd
+             this.help = help; // Short help text for the cmd
+             this.man = man; // Full manual text for the cmd
+         }
 
          // Mapping from users to an array of their groups
          var users_groups = {
@@ -41,20 +47,34 @@
          }
 
          var CV = new Item("CV.pdf");
+
  
          // CONSTRUCT THE FILESYSTEM
          var home = new Item("~", true);
          home.items.push(CV); // Put our CV in the home directory.
-  
+ 
          // Keep track of which directory we're at! 
          var currentdir = home;      
          // Keep track of the current user.   
          var currentuser = "visitor";
-        
-         // TODO keep a nice array of cmd objects instead! 
-         var cmds = ["ls", "evince", "exit"]  
-         var cmds_desc = ["list all files in the current directory", "open a pdf file in a new tab", "close the tab"];  
+
+    
+         // DEFINE ALL OF THE AVAILABLE COMMANDS
+         var CMDS  = []     
+
+         var evince = new Cmd("evince", "open a pdf file in a new tab");
+         var exit   = new Cmd("exit", "close the tab");
+         var groups = new Cmd("groups", "lists the groups that you belong to");
+         var help   = new Cmd("help");
+         var ls     = new Cmd("ls", "list all items in the current directory");
      
+         CMDS.push(evince);
+         CMDS.push(exit);
+         CMDS.push(groups);
+         CMDS.push(help); 
+         CMDS.push(ls);
+
+
          // Regex to split input into command, flags and args
          var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
         
@@ -71,7 +91,6 @@
            commandHandle:function(line){
            // split the input into command, flags and args
            var split_line = line.split(split_re);      
-           console.log(split_line);     
            if(split_line.length <= 1) return [{msg:"",className:"jquery-console-message-value"}];
  
            // grab the command
@@ -113,24 +132,53 @@
            var invalid_flags = function(command, flags) {
                return [{msg:command + ": invalid option: " + flags,className:"jquery-console-message-value"}];
            }
+           var invalid_args = function(command, args) {
+               return [{msg: command + ": invalid args: " + args,className:"jquery-console-message-value"}];
+           } 
+           var invalid_args_num = function(command, args_num, args_num_e) {
+               return [{msg: command + ": invalid number of arguments, "+ args_num + ", expected " + args_num_e, className:"jquery-console-message-value"}]; 
+           }
+           var invalid_filepath = function(command, filepath) {
+               return [{msg: command + ": invalid filepath, "+ filepath, className:"jquery-console-message-value"}];
+           }
            var return_message = function(msg) {
                return [{msg:msg,className:"jquery-console-message-value"}];
            }
-           
-           // exit
-           if(command == "help") {
-               var message = "";
-               for(var i = 0; i < cmds.length; i++) { 
-                   message += cmds[i] + " - " + cmds_desc[i] + "\n";
-               }
-               return return_message(message);
-           }
-           if(command == "exit") close(); 
-           if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
-           if(command == "groups") {
+
+          
+           // DEFINE BEHAVIOUR OF EACH AVAILABLE COMMAND
+
+           // evince 
+           if(command == "evince") {
+
+               // Check the flags and do what they want
                if(flags_b) {
+                   // There are no flags for "evince"...
                    return invalid_flags(command, flags);
                }
+               var length = 0;
+               if(args_b) length = args.length;
+               if(length != 1) {
+                   return invalid_args_num(command, length, 1);
+               }
+               // TODO: Should probably check if what we're opening is a pdf...
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var name = currentdir.items[0].name;
+                   if(args[0] == name) {
+                       window.open(name);
+                       return [{msg: command + ": opening file, "+args[0], className:"jquery-console-message-value"}];
+                   }
+               }
+               return invalid_filepath(command, args[0]);
+           } 
+
+           // exit 
+           if(command == "exit") close(); 
+           if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
+
+           // groups
+           if(command == "groups") {
+               if(flags_b) return invalid_flags(command, flags);
                var message = "";
                var groups = users_groups[currentuser];
                for(var i = 0; i < groups.length; i++) {
@@ -138,6 +186,31 @@
                }
                return return_message(message);
            }
+           
+           // help
+           if(command == "help") {
+               // If there are flags, throw the usual error
+               if(flags_b) return invalid_flags(command, flags);
+               var message = "";
+               // If there are no args, return a list of available commands
+               if(!args_b) {
+                   for(var i = 0; i < CMDS.length; i++) {
+                       message += CMDS[i].name += " ";
+                   }
+                return return_message(message);
+               }
+               // If there is more or less than one arg, invalid number of args
+               var length = 0;
+               if(args_b) length = args.length;
+               if(length != 1) return invalid_args_num(command, length, 1);
+               // Otherwise, return the help message about the given command
+               for(var i = 0; i < CMDS.length; i++) {
+                   var name = CMDS[i].name;
+                   if(args[0] == name) return return_message(CMDS[i].help);
+               }
+               return invalid_args(command, args[0]);
+           }
+           
            // ls
            if(command == "ls") {
                // Check the flags and do what they want
@@ -168,7 +241,6 @@
                    return invalid_flags(command, flags)
                }
                var message = "";
-               console.log(currentdir);
                // For each item in the current directory...
                for(var i = 0; i < currentdir.items.length; i++) {
                    // Concatenate it's name, followed by a space
@@ -176,32 +248,9 @@
                }
                return return_message(message);
            }
-           // evince 
-           if(command == "evince") {
-
-               // Check the flags and do what they want
-               if(flags_b) {
-                   // There are no flags for "evince"...
-                   return invalid_flags(command, flags);
-               }
-               var length = 0;
-               if(args_b) length = args.length;
-               if(length != 1) {
-                   return [{msg: command + ": invalid number of arguments, "+ length + ", expected 1", className:"jquery-console-message-value"}]; 
-               }
-               // TODO: Should probably check if what we're opening is a pdf...
-               for(var i = 0; i < currentdir.items.length; i++) {
-                   var name = currentdir.items[0].name;
-                   if(args[0] == name) {
-                       window.open(name);
-                       return [{msg: command + ": opening file, "+args[0], className:"jquery-console-message-value"}];
-                   }
-               }
-               return [{msg: command + ": invalid filepath, "+args[0], className:"jquery-console-message-value"}];
-           } 
-           // error
+         
+           // catches any unknown commands
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
-
            },
            autofocus:true,
            animateScroll:true,
