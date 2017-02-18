@@ -11,10 +11,7 @@
          var items = ["CV.pdf"];
          
          // Regex to split input into command and flags
-         var split_re = /(\s)*(\S*)(\s+[^-^\s])*(\s*)/
-
-         // Regular expressions for the more complex commands
-         var evince_re = /evince\s+(.*)\.pdf/;
+         var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
          
          var console1 = $('<div class="console1">');
          $('body').append(console1);
@@ -26,25 +23,46 @@
            commandHandle:function(line){
            // split the input into commands and flags
            var split_line = line.split(split_re);           
-           if(split_line.length < 3) return [{msg:"tomsh: command not found",className:"jquery-console-message-value"}];
-           
+           if(split_line == [""]) return [{msg:"tomsh: command not found",className:"jquery-console-message-value"}];
+           console.log(split_line);          
+ 
            // grab the command
-           var command = split_line[2];
+           var command_b = false;
+           var command;
+           if(split_line.length >= 1) {
+               command = split_line[1];
+               command_b = true;
+           }
            console.log(command); 
  
            // Now grab the flags
-           var flags = [];
-           // every 5th option from 2 is a flag (don't ask...)
-           for(var i = 7; i < split_line.length; i += 5) {
-               flags.push(split_line[i]);              
+           var flags_b = false;
+           var flags;
+           if(split_line[2] != undefined) {
+               flags = split_line[2];
+               flags_b = true;
+	   }
+           console.log(flags);
+    
+           // Now grab the args
+           var args_b = false;
+           var args;
+           if(split_line[4] != undefined) {
+               args = split_line[4];
+               args_b = true;
            }
-	   console.log(flags);
+           console.log(args);
 
            // exit
            if(command == "exit") close(); 
            if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
            // ls
            if(command == "ls") {
+               // Check the flags and do what they want
+               if(flags_b) {
+                   // For now, just say unrecognised option(s) + flag(s).
+                   return [{msg: "tomsh: unrecognised option(s): " + flags[0], className:"jquery-console-message-value"}];  
+               }
                var message = "";
                for(var i = 0; i < items.length; i++) {
                    message += items[i] + " ";
