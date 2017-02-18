@@ -35,6 +35,16 @@
              }
              return false;
          }
+
+         // Aux function used in commands such as ls
+         function get_filenames() {
+             names = [];
+             for(var j = 0; j < currentdir.items.length; j++) {
+                 names.push(currentdir.items[j].name);
+             }
+             return names;
+         }
+
  
          // Prototype to handle items in the 'filesystem'
          function Item(name, size=0, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
@@ -193,11 +203,8 @@
                // Check # args - (must be > 0)
                if(!args_b) return invalid_args_num(command, 0, 1);
                // Ensure all files are valid, otherwise error
+               var names = get_filenames();
                for(var i = 0; i < args.length; i++) {
-                   names = [];
-                   for(var j = 0; j < currentdir.items.length; j++) {
-                       names.push(currentdir.items[j].name);
-                   }
                    if(!contains(names ,args[i])) return invalid_filepath(command, args[i]);
                }
                // Open each file and concatenate them together
@@ -317,13 +324,12 @@
                    // For now, just say unrecognised option(s) + flag(s).
                    return invalid_flags(command, flags)
                }
-               var message = "";
-               // For each item in the current directory...
-               for(var i = 0; i < currentdir.items.length; i++) {
-                   // Concatenate it's name, followed by a space
-                   message += currentdir.items[i].name + " ";
+               message = "";
+               var fns = get_filenames(); 
+               for(var i = 0; i < fns.length; i++) {
+                   message += fns[i] + " ";
                }
-               return return_message(message);
+	       return return_message(message);
            }
         
            // man
@@ -345,7 +351,7 @@
                var length = 0;
                if(args_b) length = args.length;
                if(length != 1) return invalid_args_num(command, length, 1);
-               
+               // TODO: finish this off! 
            }
  
            // EXECUTE COMMANDS
