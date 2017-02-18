@@ -77,13 +77,14 @@
          const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
          const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
          const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
+         const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
      
          CMDS.push(evince);
          CMDS.push(exit);
          CMDS.push(groups);
          CMDS.push(help); 
          CMDS.push(ls);
-
+         CMDS.push(man);
 
          // Regex to split input into command, flags and args
          var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
@@ -183,8 +184,12 @@
            } 
 
            // exit 
-           if(command == "exit") close(); 
-           if(command == "exit") return [{msg:"The exit command does not work with your browser",className:"jquery-console-message-value"}];
+           if(command == "exit") {
+               if(flags_b) return invalid_flags(command, flags);
+               if(args_b) return invalid_args_num(command, args.length, 0);
+               close();
+           } 
+           if(command == "exit") return [{msg:"the exit command does not work with your browser",className:"jquery-console-message-value"}];
 
            // groups
            if(command == "groups") {
