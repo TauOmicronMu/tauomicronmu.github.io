@@ -41,8 +41,6 @@
   
          // Keep track of which directory we're at! 
          var currentdir = home;         
-
-         var pdfs = [CV];
  
          var cmds = ["ls", "evince", "exit"]  
          var cmds_desc = ["list all files in the current directory", "open a pdf file in a new tab", "close the tab"];  
@@ -161,13 +159,15 @@
                if(length != 1) {
                    return [{msg: command + ": invalid number of arguments, "+ length + ", expected 1", className:"jquery-console-message-value"}]; 
                }
-               for(var i = 0; i < pdfs.length; i++) {
-                   if(args[0] == pdfs[i]) {
-                       window.open(args[0]);
+               // TODO: Should probably check if what we're opening is a pdf...
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var name = currentdir.items[0].name;
+                   if(args[0] == name) {
+                       window.open(name);
                        return [{msg: command + ": opening file, "+args[0], className:"jquery-console-message-value"}];
                    }
                }
-               return [{msg: command + ": invalid file/filepath, "+args[0], className:"jquery-console-message-value"}];
+               return [{msg: command + ": invalid filepath, "+args[0], className:"jquery-console-message-value"}];
            } 
            // error
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
