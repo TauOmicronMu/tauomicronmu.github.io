@@ -12,7 +12,7 @@
 
           function readTextFile(file){
               var xhttp = new XMLHttpRequest();
-              xhttp.open("GET", file, true);
+              xhttp.open("GET", file, false);
               xhttp.onreadystatechange = function () {
                   if(xhttp.readyState === 4) {
                       if(xhttp.status === 200 || xhttp.status == 0) {
