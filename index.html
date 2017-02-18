@@ -17,8 +17,9 @@
 
          
          // Prototype to handle items in the 'filesystem'
-         function Item(name, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [], size, ts=timestamp()) {
+         function Item(name, size, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
              this.name = name; // The identifier of the item
+             this.size = size; // The size, in bytes, of the item
              this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
              this.owner = owner; // Who owns this item? (Defaults to tomg.io)
              this.group = group; // What group does this item belong to? (Defaults to user) 
@@ -241,7 +242,7 @@
                             message += " 1 "; // For now, it has 1 link as we don't have symbolic links.
                             message += item.owner + " ";
                             message += item.group + " ";
-                            // TODO: Implement filesize and show it here
+                            message += item.size + " ";
                             message += item.ts + " ";
                             message += item.name;
                             message += "\n";
