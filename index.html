@@ -64,6 +64,7 @@
 
          home.items.push(CV); // Put our CV in the home directory.
          home.items.push(Contact); // Put Contact.txt in the home directory.
+
          // Keep track of which directory we're at! 
          var currentdir = home;      
          // Keep track of the current user.   
@@ -239,10 +240,10 @@
                // Check the flags and do what they want
                if(flags_b) {
                    // -l flag : List access rights
-                   if(flags == "-l") { 
+                   if(flags == "-l") {
+                       var message = ""; 
                        for(var i = 0; i < currentdir.items.length; i++) {
                             var item = currentdir.items[i];
-                            var message = "";
                             // Is it a directory?
                             if(item.dir_b) message += "d";
                             else message += "-";
