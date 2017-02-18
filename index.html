@@ -26,7 +26,16 @@
              }
              return padding + s;
          }
-         
+        
+         function contains(a, obj) {
+             for (var i = 0; i < a.length; i++) {
+                 if (a[i] === obj) {
+                     return true;
+                 }
+             }
+             return false;
+         }
+ 
          // Prototype to handle items in the 'filesystem'
          function Item(name, size=0, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
              this.name = name; // The identifier of the item
@@ -85,7 +94,7 @@
          // DEFINE ALL OF THE AVAILABLE COMMANDS
          const CMDS  = []     
 
-         const cat = new Cmd("cat", "concatenate files and print them to standard output\n usage: cat <file 1> <file 2>...\n CURRENTLY IN DEVELOPMENT - NOT READY YET!");
+         const cat = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...\nCURRENTLY IN DEVELOPMENT - NOT READY YET!");
          const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
          const exit   = new Cmd("exit", "close the tab\n usage: exit");
          const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
@@ -176,6 +185,34 @@
 
            // cat
            //TODO: define cat!
+           if(command == "cat") {
+               // Check for no flags
+               if(flags_b) return invalid_flags(command, flags);
+               // Check # args - (must be > 0)
+               if(!args_b) return invalid_args_num(command, 0, 1);
+               // Ensure all files are valid, otherwise error
+               console.log(args);
+               for(var i = 0; i < args.length; i++) {
+                   names = [];
+                   for(var j = 0; j < currentdir.items.length; j++) {
+                       names.push(currentdir.items[j].name);
+                   }
+                   if(!contains(names ,args[i])) return invalid_filepath(command, args[i]);
+               }
+               // Open each file and concatenate them together
+               var xhttp = new XMLHttpRequest();
+               xhttp.onreadystatechange = function() {
+                   console.log(this);
+                   result += this.responseText;
+               }
+               var result = ""; 
+               for(var i = 0; i < args.length; i++) {
+                   xhttp.open("GET", args[i], true);
+                   xhttp.send();
+               }
+               // Print the resulting string
+               return return_message(command, result);
+           }
 
            // evince 
            if(command == "evince") {
