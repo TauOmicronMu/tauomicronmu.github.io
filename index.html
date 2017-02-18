@@ -17,7 +17,7 @@
 
          
          // Prototype to handle items in the 'filesystem'
-         function Item(name, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [], ts=timestamp()) {
+         function Item(name, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [], size, ts=timestamp()) {
              this.name = name; // The identifier of the item
              this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
              this.owner = owner; // Who owns this item? (Defaults to tomg.io)
@@ -55,7 +55,7 @@
              "7" : "rwx"
          }
  
-         var CV = new Item("CV.pdf");
+         var CV = new Item("CV.pdf", "149051");
 
  
          // CONSTRUCT THE FILESYSTEM
