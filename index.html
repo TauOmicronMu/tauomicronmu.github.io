@@ -82,8 +82,8 @@
          // CONSTRUCT THE FILESYSTEM
          var home = new Item("~", true);
 
-         home.items.push(CV); // Put our CV in the home directory.
          home.items.push(Contact); // Put Contact.txt in the home directory.
+         home.items.push(CV); // Put our CV in the home directory.
 
          // Keep track of which directory we're at! 
          var currentdir = home;      
@@ -101,7 +101,8 @@
          const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
          const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
          const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
-      
+         const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
+ 
          CMDS.push(cat);
          CMDS.push(evince);
          CMDS.push(exit);
@@ -109,6 +110,7 @@
          CMDS.push(help); 
          CMDS.push(ls);
          CMDS.push(man);
+         CMDS.push(touch);
 
          // Regex to split input into command, flags and args
          var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
@@ -121,7 +123,7 @@
          var controller1 = console1.console({
            promptLabel: 'visitor@tomg.io:~$ ',
            commandValidate:function(line){
-             return true;
+                return true;
            },
            commandHandle:function(line){
            // split the input into command, flags and args
