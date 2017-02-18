@@ -1,4 +1,4 @@
-<DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
           "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
@@ -9,10 +9,14 @@
     <script type="text/javascript">
       $(document).ready(function(){
          var items = ["CV.pdf"];
+         var pdfs = ["CV.pdf"];
          
          // Regex to split input into command and flags
          var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
-         
+        
+         // Regex to split args 
+         var args_split_re = /(".*"|\S*)*/;
+ 
          var console1 = $('<div class="console1">');
          $('body').append(console1);
          var controller1 = console1.console({
@@ -21,7 +25,7 @@
              return true;
            },
            commandHandle:function(line){
-           // split the input into commands and flags
+           // split the input into command, flags and args
            var split_line = line.split(split_re);           
            if(split_line == [""]) return [{msg:"tomsh: command not found",className:"jquery-console-message-value"}];
            console.log(split_line);          
@@ -39,20 +43,31 @@
            var flags_b = false;
            var flags;
            if(split_line[2] != undefined) {
-               flags = split_line[2];
+               flags = split_line[2]; //TODO: Make this less naive
                flags_b = true;
 	   }
-           console.log(flags);
+           console.log("FLAGS: " + flags);
     
            // Now grab the args
            var args_b = false;
            var args;
            if(split_line[4] != undefined) {
-               args = split_line[4];
+               args = split_line[4].split(args_split_re);
+               // Splice "" and " " from the array
+               var index = args.indexOf("");
+               while(index > -1) {
+                   args.splice(index, 1);
+                   index = args.indexOf("");
+               }
+               index = args.indexOf(" ");
+               while(index > -1) {
+                   args.splice(index, 1);
+                   index = args.indexOf(" ");
+               }
                args_b = true;
            }
            console.log(args);
-
+           
            // exit
            if(command == "exit") close(); 
            if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
@@ -70,7 +85,26 @@
                return [{msg: message, className:"jquery-console-message-value"}];
            }
            // evince 
-            
+           if(command == "evince") {
+               // Check the flags and do what they want
+               if(flags_b) {
+                   // There are no flags for "evince"...
+                   return [{msg: command + ": invalid option: " + flags, className:"jquery-console-message-value"}];  
+               }
+               var length = args.length;
+               if(args.length == undefined) length = 0;
+               console.log(length);
+               if(length != 1) {
+                   return [{msg: command + ": invalid number of arguments, "+ length + ", expected 1", className:"jquery-console-message-value"}]; 
+               }
+               for(var i = 0; i < pdfs.length; i++) {
+                   if(args[0] == pdfs[i]) {
+                       window.open(args[0]);
+                       return [{msg: command + ": opening file, "+args[0], className:"jquery-console-message-value"}];
+                   }
+               }
+               return [{msg: command + ": invalid file/filepath, "+args[0], className:"jquery-console-message-value"}];
+           } 
            // error
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
 
