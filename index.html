@@ -47,7 +47,7 @@
 
  
          // Prototype to handle items in the 'filesystem'
-         function Item(name, size=0, dir_b = false, owner = "tomg.io", group = "user", owner_a = "7", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
+         function Item(name, size=0, dir_b = false, owner = "tomg.io", group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
              this.name = name; // The identifier of the item
              this.size = sizepad(size); // The size, in bytes, of the item
              this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
@@ -88,12 +88,15 @@
  
          var CV = new Item("CV.pdf", "149051");
          var Contact = new Item("contact.txt", "370");
-
+         var Edu = new Item("education.txt", "1337");
+         var Hey = new Item("hey.txt", "775");
          // CONSTRUCT THE FILESYSTEM
          var home = new Item("~", true);
 
          home.items.push(Contact); // Put Contact.txt in the home directory.
          home.items.push(CV); // Put our CV in the home directory.
+         home.items.push(Edu); 
+         home.items.push(Hey); 
 
          // Keep track of which directory we're at! 
          var currentdir = home;      
@@ -278,7 +281,7 @@
                if(!args_b) {
                    message += "here is a list of available commands - (use help <command> for details about them):\n";
                    for(var i = 0; i < CMDS.length; i++) {
-                       message += CMDS[i].name + " ";
+                       message += CMDS[i].name + "  ";
                    }
                 return return_message(message);
                }
@@ -327,7 +330,7 @@
                message = "";
                var fns = get_filenames(); 
                for(var i = 0; i < fns.length; i++) {
-                   message += fns[i] + " ";
+                   message += fns[i] + "  ";
                }
 	       return return_message(message);
            }
