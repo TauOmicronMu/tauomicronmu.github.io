@@ -10,6 +10,20 @@
       $(document).ready(function(){
          const MAX_FILESIZE_LENGTH = 6;
 
+          function readTextFile(file){
+              var xhttp = new XMLHttpRequest();
+              xhttp.open("GET", file, true);
+              xhttp.onreadystatechange = function () {
+                  if(xhttp.readyState === 4) {
+                      if(xhttp.status === 200 || xhttp.status == 0) {
+                          console.log(xhttp);
+                          return xhttp.response;
+                      }
+                  }
+              }
+              xhttp.send(null);
+         }
+ 
          // Get current timestamp in correct format
          function timestamp() {
              var c_ts = (new Date(Date.now())).toString();
@@ -191,7 +205,6 @@
                // Check # args - (must be > 0)
                if(!args_b) return invalid_args_num(command, 0, 1);
                // Ensure all files are valid, otherwise error
-               console.log(args);
                for(var i = 0; i < args.length; i++) {
                    names = [];
                    for(var j = 0; j < currentdir.items.length; j++) {
@@ -200,18 +213,11 @@
                    if(!contains(names ,args[i])) return invalid_filepath(command, args[i]);
                }
                // Open each file and concatenate them together
-               var xhttp = new XMLHttpRequest();
-               xhttp.onreadystatechange = function() {
-                   console.log(this);
-                   result += this.responseText;
-               }
-               var result = ""; 
-               for(var i = 0; i < args.length; i++) {
-                   xhttp.open("GET", args[i], true);
-                   xhttp.send();
-               }
+               var result = "";
+               for(var i = 0; i < args.length; i++) result += readTextFile(args[i]);
+            
                // Print the resulting string
-               return return_message(command, result);
+               return return_message(result);
            }
 
            // evince 
