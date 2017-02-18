@@ -10,7 +10,10 @@
       $(document).ready(function(){
          var items = ["CV.pdf"];
          var pdfs = ["CV.pdf"];
-         
+ 
+         var cmds = ["ls", "evince", "exit"]  
+         var cmds_desc = ["list all files in the current directory", "open a pdf file in a new tab", "close the tab"];  
+     
          // Regex to split input into command and flags
          var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
         
@@ -65,6 +68,13 @@
            }
            
            // exit
+           if(command == "help") {
+               var message = "";
+               for(var i = 0; i < cmds.length; i++) { 
+                   message += cmds[i] + " - " + cmds_desc[i] + "\n";
+               }
+               return[{msg:message, className:"jquery-console-message-value"}];
+           }
            if(command == "exit") close(); 
            if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
            // ls
