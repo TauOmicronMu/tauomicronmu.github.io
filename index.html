@@ -174,7 +174,7 @@
 
            // exit 
            if(command == "exit") close(); 
-           if(command == "exit") return [{msg:"The exit command does not work with your browser.",className:"jquery-console-message-value"}];
+           if(command == "exit") return [{msg:"The exit command does not work with your browser",className:"jquery-console-message-value"}];
 
            // groups
            if(command == "groups") {
@@ -194,6 +194,7 @@
                var message = "";
                // If there are no args, return a list of available commands
                if(!args_b) {
+                   message += "here is a list of available commands - (use help <command> for details about them):\n";
                    for(var i = 0; i < CMDS.length; i++) {
                        message += CMDS[i].name += " ";
                    }
