@@ -60,13 +60,13 @@
 
     
          // DEFINE ALL OF THE AVAILABLE COMMANDS
-         var CMDS  = []     
+         const CMDS  = []     
 
-         var evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
-         var exit   = new Cmd("exit", "close the tab\n usage: exit");
-         var groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
-         var help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
-         var ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
+         const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
+         const exit   = new Cmd("exit", "close the tab\n usage: exit");
+         const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
+         const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
+         const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
      
          CMDS.push(evince);
          CMDS.push(exit);
@@ -196,7 +196,7 @@
                if(!args_b) {
                    message += "here is a list of available commands - (use help <command> for details about them):\n";
                    for(var i = 0; i < CMDS.length; i++) {
-                       message += CMDS[i].name += " ";
+                       message += CMDS[i].name + " ";
                    }
                 return return_message(message);
                }
@@ -204,6 +204,7 @@
                var length = 0;
                if(args_b) length = args.length;
                if(length != 1) return invalid_args_num(command, length, 1);
+               console.log(CMDS);
                // Otherwise, return the help message about the given command
                for(var i = 0; i < CMDS.length; i++) {
                    var name = CMDS[i].name;
