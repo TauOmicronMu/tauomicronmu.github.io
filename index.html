@@ -329,8 +329,8 @@
                if(cat[0] == ERROR.NO_ERROR) return return_message(cat[1]);
                // TODO: account for the right errors
                var len = args_len();
-               if(len > 0) return error_handler(cat[0], command, flags, args, 0, len, args);
-               return error_handler(cat[0], command, flags, args, 0, len);
+               if(len > 0) return error_handler(cat[0], command, flags, args, ">0", len, args);
+               return error_handler(cat[0], command, flags, args, ">0", len);
            }
 
            // evince 
