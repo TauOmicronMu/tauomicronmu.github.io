@@ -205,7 +205,9 @@
                // remove surrounding quotes
                for(var i = 0; i < args.length; i++) {
                    var arg = args[i];
-                   if(arg.slice(0,1) == '"' && arg.slice(args.length-1,args.length) == '"') args[i] = arg.slice(1,arg.length -1);
+                   if(arg != undefined) {
+                       if(arg.slice(0,1) == '"' && arg.slice(args.length-1,args.length) == '"') args[i] = arg.slice(1,arg.length -1);
+                   }
                }
            }
 
