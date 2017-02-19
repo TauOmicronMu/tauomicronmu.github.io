@@ -225,20 +225,15 @@
 
            // Common error messages 
            var invalid_flags = function(command, flags) {
-               return [{msg:command + ": invalid option: " + flags,className:"jquery-console-message-value"}];
-           }
+               return [{msg:command + ": invalid option: " + flags,className:"jquery-console-message-value"}]; }
            var invalid_args = function(command, args) {
-               return [{msg: command + ": invalid args: " + args,className:"jquery-console-message-value"}];
-           } 
+               return [{msg: command + ": invalid args: " + args,className:"jquery-console-message-value"}]; }
            var invalid_args_num = function(command, args_num, args_num_e) {
-               return [{msg: command + ": invalid number of arguments, "+ args_num + ", expected " + args_num_e, className:"jquery-console-message-value"}]; 
-           }
+               return [{msg: command + ": invalid number of arguments, "+ args_num + ", expected " + args_num_e, className:"jquery-console-message-value"}]; }
            var invalid_filepath = function(command, filepath) {
-               return [{msg: command + ": invalid filepath(s), "+ filepath, className:"jquery-console-message-value"}];
-           }
-           var return_message = function(msg) {
-               return [{msg:msg,className:"jquery-console-message-value"}];
-           }
+               return [{msg: command + ": invalid filepath(s), "+ filepath, className:"jquery-console-message-value"}]; }
+           var return_message = function(msg) { 
+               return [{msg:msg,className:"jquery-console-message-value"}]; }
 
            // ERRORS ENUM
            var ERROR = {
@@ -269,9 +264,8 @@
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                if(!args_b) return [ERROR.INVALID_ARGS_NUM, null];
                var names = get_filenames();
-               for(var i = 0; i < args.length; i++) {
-                   if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null];
-               }
+               // Ensure all args are valid filepaths.
+               for(var i = 0; i < args.length; i++) if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null]; 
                var ret_str = "";
                // Open each file, and concat
                for(var i = 0; i < args.length; i++) {
@@ -290,7 +284,24 @@
                } 
                return [ERROR.NO_ERROR, ret_str];
            }
-          
+
+           // evince
+           // dependencies: 
+           function evince_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               // TOOD: check if we're opening a non-empty file...
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var name = currentdir.items[i].name;
+                   if(args[0] == name) {
+                       window.open(name);
+                       return [ERROR.NO_ERROR, null];
+                   } 
+               }
+               return [ERROR.INVALID_FILEPATH, null];
+           }
+
            // ls
            // dependencies: 
            function ls_a() { 
@@ -327,7 +338,6 @@
            function cat_c() {
                var cat = cat_a();
                if(cat[0] == ERROR.NO_ERROR) return return_message(cat[1]);
-               // TODO: account for the right errors
                var len = args_len();
                if(len > 0) return error_handler(cat[0], command, flags, args, ">0", len, args);
                return error_handler(cat[0], command, flags, args, ">0", len);
@@ -335,26 +345,10 @@
 
            // evince 
            function evince_c() {
-
-               // Check the flags and do what they want
-               if(flags_b) {
-                   // There are no flags for "evince"...
-                   return invalid_flags(command, flags);
-               }
-               var length = 0;
-               if(args_b) length = args.length;
-               if(length != 1) {
-                   return invalid_args_num(command, length, 1);
-               }
-               // TODO: Should probably check if what we're opening is a pdf...
-               for(var i = 0; i < currentdir.items.length; i++) {
-                   var name = currentdir.items[i].name;
-                   if(args[0] == name) {
-                       window.open(name);
-                       return [{msg: command + ": opening file, "+args[0], className:"jquery-console-message-value"}];
-                   }
-               }
-               return invalid_filepath(command, args[0]);
+               var evince = evince_a();
+               var len = args_len();
+               if(evince_a[0] == 0) return return_message("evince: opening file, " + args[0]);
+               return error_handler(evince[0], command, flags, args, "1", len, args); 
            } 
 
            // exit 
