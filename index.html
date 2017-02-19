@@ -418,6 +418,27 @@
            autofocus:true,
            animateScroll:true,
            promptHistory:true,
+           welcomeMessage: 
+`
+   
+  \\ \\   \\ \\     | |                             | |    
+   \\ \\   \\ \\    | |_    ___    _ __ ___    ___  | |__  
+    > >   > >   | __|  / _ \\  | '_ \` _ \\  / __| | '_ \\ 
+   / /   / /    | |_  | (_) | | | | | | | \\__ \\ | | | |
+  /_/   /_/      \\__|  \\___/  |_| |_| |_| |___/ |_| |_|
+
+       Welcome to 'tom shell' (tomsh) - I'm Tom Goodman, and this is
+   my personal website! tomsh works almost like a restricted subset
+   of bash, so try what you can! If you manage to break it, (please
+   try! :D) let me know and I'll do my best to deploy a fix ASAP <3
+       
+       If you need some help, type 'help', and you should be gucci. (If not,
+   type 'evince CV.pdf' to open my CV!). Quick hint, 'Ctrl + l' will clear
+   the screen (including this!).
+       
+       Enjoy! And let me know what you think!
+                                              ~Tom - @TauOmicronMu
+`,
            });
         });
     </script>
@@ -459,6 +480,7 @@
        { color:#52666f; font-family:monospace;
          padding:0.1em; }
       div.console1 span.jquery-console-prompt-label { font-weight:bold }
+      div.jquery-console-welcome { text-align: center; color: #1ad027; font-family:monospace }
     </style>
   </head>
   <body>
