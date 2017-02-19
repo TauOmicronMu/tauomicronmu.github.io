@@ -58,7 +58,6 @@
                return names;
            }
 
- 
            // Prototype to handle items in the 'filesystem'
            function Item(name, size=sizepad(0), empty=false, data="", dir_b = false, owner = curuser(), group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
                this.name = name; // The identifier of the item
@@ -101,6 +100,17 @@
                "6" : "rw-", 
                "7" : "rwx"
            }
+
+           var access_bool_map = {
+               "0" : [false, false, false],
+               "1" : [false, false, true],
+               "2" : [false, true, false],
+               "3" : [false, true, true],
+               "4" : [true, false, false],
+               "5" : [true, false, true],
+               "6" : [true, true, false],
+               "7" : [true, true, true]
+           }
  
            // Set these perms for original filesystem
            var currentuser = "tomg.io";
@@ -123,8 +133,27 @@
            var filepath = ["~"];
            // Keep track of the current user.   
            currentuser = "visitor";
+   
+           // What permissions does the current user have for a given item on the
+           // filesystem? returns [bool, bool, bool], corresponding to [r, w, x].
+           function user_perms_on_item(item) {
+               var user_groups = users_groups[currentuser];
+               var perms;
+               var owner_perms = false;
+               var group_perms = false;
+               if(contains(user_groups, item.owner)) {
+                   perms = item.owner_a;
+                   owner_perms = true;
+               }
+               if(contains(user_groups, item.group)) {
+                   if(owner_perms) perms = max(item.owner_a, item.group_a);
+                   else            perms = item.group_a;
+                   group_perms = true;
+               }
+               if(!(owner_perms || group_perms)) perms = item.other_a;
+               return access_bool_map[perms];
+           } 
 
-    
            // DEFINE ALL OF THE AVAILABLE COMMANDS
            const CMDS  = []     
   
@@ -259,7 +288,6 @@
            // DEFINE AUXILIARY FUNCTIONS THAT ENCAPSULATE 
            // FUNCTIONALITY OF EACH COMMAND. 
            // Each returns : [RETURN_CODE, RESULT]
-           // TODO: Actually do this... :') 
            
            // cat
            // dependencies: 
@@ -408,7 +436,6 @@
 
            // DEFINE COMMANDS
            // TODO: Actually do checks on access permissions
-           // TODO: Update timestamps when you use a file outside of touch.
 
            // cat
            function cat_c() {
