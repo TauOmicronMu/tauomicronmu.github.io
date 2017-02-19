@@ -128,7 +128,7 @@
            // DEFINE ALL OF THE AVAILABLE COMMANDS
            const CMDS  = []     
   
-           const cat = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
+           const cat    = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
            const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
            const exit   = new Cmd("exit", "close the tab\n usage: exit");
            const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
@@ -263,12 +263,12 @@
            // TODO: Actually do this... :') 
            
            // cat
-           // dependencies: ls 
+           // dependencies: 
            function cat_a() {
                // Error checking
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                if(!args_b) return [ERROR.INVALID_ARGS_NUM, null];
-               var names = ls_a();
+               var names = get_filenames();
                for(var i = 0; i < args.length; i++) {
                    if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null];
                }
@@ -327,6 +327,7 @@
            function cat_c() {
                var cat = cat_a();
                if(cat[0] == ERROR.NO_ERROR) return return_message(cat[1]);
+               // TODO: account for the right errors
                return error_handler(cat[0], command, flags, args, 0);
            }
 
