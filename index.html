@@ -232,7 +232,7 @@
                return [{msg: command + ": invalid number of arguments, "+ args_num + ", expected " + args_num_e, className:"jquery-console-message-value"}]; }
            var invalid_filepath = function(command, filepath) {
                return [{msg: command + ": invalid filepath(s), "+ filepath, className:"jquery-console-message-value"}]; }
-           var command_not_supported = funciton(command) {
+           var command_not_supported = function(command) {
                return [{msg: "the " + command + " command is not supported by your browser", className:"jquery-console-message-value"}]; }
            var return_message = function(msg) { 
                return [{msg:msg,className:"jquery-console-message-value"}]; }
@@ -248,11 +248,11 @@
            }
 
            function error_handler(code, command, flags, args, args_num_e, args_num=args_len(), filepath="") {
-               if(code == ERROR.INVALID_FLAGS)        return invalid_flags         (command, flags);
-               if(code == ERROR.INVALID_ARGS)         return invalid_args          (command, args);
-               if(code == ERROR.INVALID_ARGS_NUM)     return invalid_args_num      (command, args_num, args_num_e);
-               if(code == ERROR.INVALID_FILEPATH)     return invalid_filepath      (command, filepath);
-               if(code == ERROR.COMMAND_NOT_SUPPORTED return command_not_supported (command);
+               if(code == ERROR.INVALID_FLAGS)         return invalid_flags         (command, flags);
+               if(code == ERROR.INVALID_ARGS)          return invalid_args          (command, args);
+               if(code == ERROR.INVALID_ARGS_NUM)      return invalid_args_num      (command, args_num, args_num_e);
+               if(code == ERROR.INVALID_FILEPATH)      return invalid_filepath      (command, filepath);
+               if(code == ERROR.COMMAND_NOT_SUPPORTED) return command_not_supported (command);
                return return_message("");
            }
 
@@ -306,6 +306,15 @@
                return [ERROR.INVALID_FILEPATH, null];
            }
 
+           // exit
+           // dependencies: 
+           function exit_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null]
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null]
+               close();
+               return [ERROR.COMMAND_NOT_SUPPORTED, null];
+           } 
+
            // ls
            // dependencies: 
            function ls_a() { 
@@ -348,7 +357,6 @@
                }
                return ERROR.NO_ERROR;
            }
-
            function touch_a() {
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                var len = args_len();
@@ -360,7 +368,6 @@
            // DEFINE COMMANDS
            // TODO: Actually do checks on access permissions
            // TODO: Update timestamps when you use a file outside of touch.
-
 
            // cat
            function cat_c() {
@@ -375,16 +382,16 @@
            function evince_c() {
                var evince = evince_a();
                var len = args_len();
-               if(evince_a[0] == 0) return return_message("evince: opening file, " + args[0]);
+               if(evince_a[0] == ERROR.NO_ERROR) return return_message("evince: opening file, " + args[0]);
                return error_handler(evince[0], command, flags, args, "1", len, args); 
            } 
 
            // exit 
            function exit_c() {
-               if(flags_b) return invalid_flags(command, flags);
-               if(args_b) return invalid_args_num(command, args.length, 0);
-               close();
-               return [{msg:"the exit command does not work with your browser",className:"jquery-console-message-value"}];
+               var exit = exit_a();
+               var len = args_len();
+               if(evince_a[0] == ERROR.NO_ERROR) return return_message("");
+               return error_handler(exit[0], command, flags, args, "0", len);
            }
    
            // groups
