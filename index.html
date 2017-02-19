@@ -48,7 +48,7 @@
                }
                return false;
            }
-
+ 
            // Returns the item with the specified name from the current directory
            // (or null if it doesn't exist).
            function item_from_name(fn) {
@@ -177,6 +177,7 @@
            const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
            const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
            const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>\n STILL IN DEVELOPMENT - WILL NOT WORK!");
+           const rm     = new Cmd("rm", "removes a given file from the current directory.\nusage: rm <name>\n");
            const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
  
            CMDS.push(cat);
@@ -187,6 +188,7 @@
            CMDS.push(ls);
            CMDS.push(man);
            CMDS.push(mkdir);
+           CMDS.push(rm);
            CMDS.push(touch);
 
            // Regex to split input into command, flags and args
@@ -433,6 +435,18 @@
                }
                return [ERROR.INVALID_ARGS, null];
            }
+
+           // rm
+           // dependencies :
+           function rm_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               var names = get_filenames();
+               if(!contains(names, args[0])) return [ERROR.INVALID_ARGS, null];
+               currentdir.items.splice(currentdir.items.indexOf(args[0]),1);
+               return [ERROR.NO_ERROR, null]; 
+           }
    
            // touch
            // dependencies: 
@@ -515,6 +529,14 @@
                var len = args_len();
                return error_handler(man[0], command, flags, args, "1", len);
            }
+
+           // rm 
+           function rm_c() {
+               var rm = rm_a();
+               if(rm[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
+               return error_handler(rm[0], command, flags, args, "1", len, args);
+           }
            
            // touch
            function touch_c() {
@@ -532,6 +554,7 @@
            if(command == "help")   return help_c();
            if(command == "ls")     return ls_c();
            if(command == "man")    return man_c();
+           if(command == "rm")     return rm_c();
            if(command == "touch")  return touch_c(); 
            // catches any unknown commands
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
