@@ -165,6 +165,8 @@
            // split the input into command, flags and args
            var split_line = line.split(split_re);      
            if(split_line.length <= 1) return [{msg:"",className:"jquery-console-message-value"}];
+
+           // TODO: Deal with &&, ||, | etc.
  
            // grab the command
            var command_b = false;
@@ -210,6 +212,16 @@
                    }
                }
            }
+         
+          
+           // Returns the number of arguments being passed to the current command.
+           function args_len() {
+               length = 0;
+               if(args_b) length = args.length;
+               return length;
+           }
+
+           // ERROR HANDLING
 
            // Common error messages 
            var invalid_flags = function(command, flags) {
@@ -228,44 +240,94 @@
                return [{msg:msg,className:"jquery-console-message-value"}];
            }
 
+           // ERRORS ENUM
+           var ERROR = {
+               NO_ERROR         : 0,    
+               INVALID_FLAGS    : 1,
+               INVALID_ARGS     : 2,
+               INVALID_ARGS_NUM : 3,
+               INVALID_FILEPATH : 4,
+           }
+
+           function error_handler(code, command, flags, args, args_num_e, args_num=args_len(), filepath="") {
+               if(code == ERROR.INVALID_FLAGS)    return invalid_flags    (command, flags);
+               if(code == ERROR.INVALID_ARGS)     return invalid_args     (command, args);
+               if(code == ERROR.INVALID_ARGS_NUM) return invalid_args_num (command, args_num, args_num_e);
+               if(code == ERROR.INVALID_FILEPATH) return invalid_filepath (command, filepath);
+               return return_message("");
+           }
+
+           // DEFINE AUXILIARY FUNCTIONS THAT ENCAPSULATE 
+           // FUNCTIONALITY OF EACH COMMAND. 
+           // Each returns : [RETURN_CODE, RESULT]
+           // TODO: Actually do this... :') 
            
-           // DEFINE BEHAVIOUR OF EACH AVAILABLE COMMAND
+           // cat
+           // dependencies: ls 
+           function cat_a() {
+               // Error checking
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(!args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               var names = ls_a();
+               for(var i = 0; i < args.length; i++) {
+                   if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null];
+               }
+               var ret_str = "";
+               // Open each file, and concat
+               for(var i = 0; i < args.length; i++) {
+                   // In this case, grab the file
+                   if(!isEmpty(args[i])) {
+                       var xhttp = new XMLHttpRequest();
+                       xhttp.open("GET", args[i], false);
+                       xhttp.onreadystatechange = function() {
+                           if((xhttp.readyState == 4) && (xhttp.status == 200 || xhttp.status == 0)) {
+                               ret_str += xhttp.responseText;
+                           }
+                       }
+                       xhttp.send(null);
+                   }
+               ret_str += "";
+               } 
+               return [ERROR.NO_ERROR, ret_str];
+           }
+          
+           // ls
+           // dependencies: 
+           function ls_a() { 
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               if(!flags_b) {
+                   ret_str = "";
+                   var fns = get_filenames(); 
+                   for(var i = 0; i < fns.length; i++) {
+                       ret_str += fns[i] + "  ";
+                   }
+                   return [ERROR.NO_ERROR, ret_str];
+               }
+               if(flags == "-l") {
+                   var ret_str = "";
+                   for(var i = 0; i < currentdir.items.length; i++) {
+                       var item = currentdir.items[i];
+                       if(item.dir_b) ret_str += "d";
+                       else ret_str += "-";
+                       ret_str += access_map[item.owner_a] + access_map[item.group_a] + access_map[item.other_a] + " "; // Access perms
+                       ret_str += "1 "; // Number of links
+                       ret_str += item.owner + " " + item.group + " " + item.size + " " + item.ts + " " + item.name + "\n";
+                   }
+                   return [ERROR.NO_ERROR, ret_str];
+               }
+               return [ERROR.INVALID_FLAGS, null];
+           } 
+
+           // DEFINE COMMANDS
            // TODO: Actually do checks on access permissions
            // TODO: Update timestamps when you use a file outside of touch.
 
 
            // cat
-           function cat_c() { 
-               // Check for no flags
-               if(flags_b) return invalid_flags(command, flags);
-               // Check # args - (must be > 0)
-               if(!args_b) return invalid_args_num(command, 0, 1);
-               // Ensure all files are valid, otherwise error
-               var names = get_filenames();
-               for(var i = 0; i < args.length; i++) {
-                   if(!contains(names ,args[i])) return invalid_filepath(command, args[i]);
-               }
-               var message = "";
-               // Open each file and concatenate them together
-               for(var i = 0; i < args.length; i++) {
-                   if(isEmpty(args[i])) {
-                       message += "";
-                   }
-                   else {
-                       var xhttp = new XMLHttpRequest();
-                       xhttp.open("GET", args[i], false);
-                       xhttp.onreadystatechange = function () {
-                           if(xhttp.readyState == 4) {
-                               if(xhttp.status == 200 || xhttp.status == 0) {
-                                   message += xhttp.responseText;
-                               }
-                           }
-                       }
-                       xhttp.send(null);
-                   }
-               }
-               // Print the resulting string
-               return return_message(message);
+           function cat_c() {
+               var cat = cat_a();
+               if(cat[0] == ERROR.NO_ERROR) return return_message(cat[1]);
+               return error_handler(cat[0], command, flags, args, 0);
            }
 
            // evince 
@@ -339,39 +401,10 @@
            
            // ls
            function ls_c() {
-               // Check the flags and do what they want
-               if(flags_b) {
-                   // -l flag : List access rights
-                   if(flags == "-l") {
-                       var message = ""; 
-                       for(var i = 0; i < currentdir.items.length; i++) {
-                            var item = currentdir.items[i];
-                            // Is it a directory?
-                            if(item.dir_b) message += "d";
-                            else message += "-";
-                            // Add on the 3 access perms
-                            message += access_map[item.owner_a];
-                            message += access_map[item.group_a];
-                            message += access_map[item.other_a];
-                            message += " 1 "; // For now, it has 1 link as we don't have symbolic links.
-                            message += item.owner + " ";
-                            message += item.group + " ";
-                            message += item.size + " ";
-                            message += item.ts + " ";
-                            message += item.name;
-                            message += "\n";
-                       }
-                       return return_message(message);
-                   }
-                   // For now, just say unrecognised option(s) + flag(s).
-                   return invalid_flags(command, flags)
-               }
-               message = "";
-               var fns = get_filenames(); 
-               for(var i = 0; i < fns.length; i++) {
-                   message += fns[i] + "  ";
-               }
-	       return return_message(message);
+               var ls = ls_a();
+               console.log(ls);
+               if(ls[0] == ERROR.NO_ERROR) return return_message(ls[1]);
+               return error_handler(ls[0], command, flags, args, 0); 
            }
         
            // man
