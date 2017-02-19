@@ -186,15 +186,15 @@
            CMDS.push(help); 
            CMDS.push(ls);
            CMDS.push(man);
-           CMDS.push(touch);
            CMDS.push(mkdir);
+           CMDS.push(touch);
 
            // Regex to split input into command, flags and args
            var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
            
            // Regex to split args 
            var args_split_re = /(".*"|\S*)*/;
- 
+
            var console1 = $('<div class="console1">');
            $('body').append(console1);
            var controller1 = console1.console({
