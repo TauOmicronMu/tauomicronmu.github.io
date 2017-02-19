@@ -273,7 +273,7 @@
                }
                // TODO: Should probably check if what we're opening is a pdf...
                for(var i = 0; i < currentdir.items.length; i++) {
-                   var name = currentdir.items[0].name;
+                   var name = currentdir.items[i].name;
                    if(args[0] == name) {
                        window.open(name);
                        return [{msg: command + ": opening file, "+args[0], className:"jquery-console-message-value"}];
