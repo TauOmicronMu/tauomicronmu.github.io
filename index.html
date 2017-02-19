@@ -157,7 +157,7 @@
                    owner_perms = true;
                }
                if(contains(user_groups, i.group)) {
-                   if(owner_perms) perms = max(i.owner_a, i.group_a);
+                   if(owner_perms) perms = Math.max(i.owner_a, i.group_a);
                    else            perms = i.group_a;
                    group_perms = true;
                }
@@ -444,6 +444,7 @@
                if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
                var names = get_filenames();
                if(!contains(names, args[0])) return [ERROR.INVALID_ARGS, null];
+               if(!userperms(args[0])[1]) return [ERROR.PERMISSION_DENIED, null];
                currentdir.items.splice(currentdir.items.indexOf(args[0]),1);
                return [ERROR.NO_ERROR, null]; 
            }
