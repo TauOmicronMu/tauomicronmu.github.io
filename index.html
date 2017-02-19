@@ -332,7 +332,7 @@
            // touch
            // dependencies: 
            function touch(fn) {
-               if(fn == "") currentdir.items.push(new Item(fn, sizepad(0), true));
+               if(!contains(get_filenames(), fn)) currentdir.items.push(new Item(fn, sizepad(0), true));
                else {
                    for(var i = 0; i < currentdir.items.length; i++) {
                        var item = currentdir.items[i]; 
@@ -348,9 +348,8 @@
            function touch_a() {
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                var len = args_len();
-               if(len > 1) return [ERROR.INVALID_ARGS_NUM, null];
-               if(len !=  0) touch(args[0]);
-               touch("");
+               if(len > 1 || len == 0) return [ERROR.INVALID_ARGS_NUM, null];
+               touch(args[0]);
                return [ERROR.NO_ERROR, ""];
            }
 
