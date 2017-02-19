@@ -369,6 +369,19 @@
                }
                return [ERROR.INVALID_FLAGS, null];
            } 
+
+           // man
+           // dependencies :
+           function man_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               for(var i = 0; i < CMDS.length; i++) {
+                   var cmd = CMDS[i];
+                   if(cmd.name == args[0]) return [ERROR.NO_ERROR, cmd.man];
+               }
+               return [ERROR.INVALID_ARGS, null];
+           }
    
            // touch
            // dependencies: 
@@ -447,15 +460,10 @@
         
            // man
            function man_c() {
-               if(flags_b) return invalid_flags(command, flags);
-               var length = 0;
-               if(args_b) length = args.length;
-               if(length != 1) return invalid_args_num(command, length, 1);
-               for(var i = 0; i < CMDS.length; i++) {
-                   var cmd = CMDS[i];
-                   if(cmd.name == args[0]) return return_message(cmd.man);
-               }
-               return invalid_args(command, args);
+               var man = man_a();
+               if(man[0] == ERROR.NO_ERROR) return return_message(man[1]);
+               var len = args_len();
+               return error_handler(man[0], command, flags, args, "1", len);
            }
            
            // touch
