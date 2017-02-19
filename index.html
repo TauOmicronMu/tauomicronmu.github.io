@@ -258,7 +258,8 @@
            // TODO: Actually do this... :') 
            
            // cat
-           // dependencies: 
+           // dependencies: touch
+           // TODO: touch the file.
            function cat_a() {
                // Error checking
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
@@ -286,7 +287,8 @@
            }
 
            // evince
-           // dependencies: 
+           // dependencies: touch
+           // TODO: touch the file.
            function evince_a() {
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                var len = args_len();
@@ -328,6 +330,31 @@
                }
                return [ERROR.INVALID_FLAGS, null];
            } 
+   
+           // touch
+           // dependencies: 
+           function touch(fn) {
+               if(fn == "") currentdir.items.push(new Item(fn, sizepad(0), true));
+               else {
+                   for(var i = 0; i < currentdir.items.length; i++) {
+                       var item = currentdir.items[i]; 
+                       if(fn == item.name) {
+                           currentdir.items[i].ts = timestamp();
+                           return ERROR.NO_ERROR;
+                       }
+                   }
+               }
+               return ERROR.NO_ERROR;
+           }
+
+           function touch_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len > 1) return [ERROR.INVALID_ARGS_NUM, null];
+               if(len !=  0) touch(args[0]);
+               touch("");
+               return [ERROR.NO_ERROR, ""];
+           }
 
            // DEFINE COMMANDS
            // TODO: Actually do checks on access permissions
@@ -417,21 +444,10 @@
            
            // touch
            function touch_c() {
-               if(flags_b) return invalid_flags(command, flags);
-               var length = 0;
-               if(args_b) length = args.length;
-               if(length != 1) return invalid_args_num(command, length, 1);
-               for(var i = 0; i < currentdir.items.length; i++) {
-                   var item = currentdir.items[i];
-                   if(args[0] == item.name) {
-                       currentdir.items[i].ts = timestamp();
-                       return return_message("");
-                   }
-               }
-               // Create a blank file with the given name
-               var name = args[0]; 
-               currentdir.items.push(new Item(args[0], sizepad(0), true));
-               return return_message("");
+               var touch = touch_a();
+               if(touch[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
+               return error_handler(touch[0], command, flags, args, "0 or 1", len, args);
            }
  
            // EXECUTE COMMANDS
