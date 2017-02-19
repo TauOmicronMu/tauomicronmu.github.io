@@ -7,156 +7,156 @@
     <script type="text/javascript" src="jquery.console.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
-         const MAX_FILESIZE_LENGTH = 6;
+           const MAX_FILESIZE_LENGTH = 6;
 
-         // Return the current user
-         function curuser() { return currentuser; }
+           // Return the current user
+           function curuser() { return currentuser; }
 
-         // Return whether or not a file is empty
-         function isEmpty(filename) {
-             for(var i = 0; i < currentdir.items.length; i++) {
-                 var item = currentdir.items[i];
-                 if(item.name == filename) {
-                     return item.empty;
-                 }
-             }
-             return true; // I guess?
-         }
+           // Return whether or not a file is empty
+           function isEmpty(filename) {
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var item = currentdir.items[i];
+                   if(item.name == filename) {
+                       return item.empty;
+                   }
+               }
+               return true; // I guess?
+           }
 
-         // Get current timestamp in correct format
-         function timestamp() {
-             var c_ts = (new Date(Date.now())).toString();
-             var c_ts_split = c_ts.split(" ");
-             return c_ts_split[1] + " " + c_ts_split[2] + " " + c_ts_split[4];    
-         }
+           // Get current timestamp in correct format
+           function timestamp() {
+               var c_ts = (new Date(Date.now())).toString();
+               var c_ts_split = c_ts.split(" ");
+               return c_ts_split[1] + " " + c_ts_split[2] + " " + c_ts_split[4];    
+           }
 
-         function sizepad(s) {
-             var pad_n = MAX_FILESIZE_LENGTH - s.length;
-             var padding = "";
-             if(pad_n == 0) return s;
-             for(var i = 0; i < pad_n; i++) {
-                 padding += " ";
-             }
-             return padding + s;
-         }
+           function sizepad(s) {
+               var pad_n = MAX_FILESIZE_LENGTH - s.length;
+               var padding = "";
+               if(pad_n == 0) return s;
+               for(var i = 0; i < pad_n; i++) {
+                   padding += " ";
+               }
+               return padding + s;
+           }
         
-         function contains(a, obj) {
-             for (var i = 0; i < a.length; i++) {
-                 if (a[i] === obj) {
-                     return true;
-                 }
-             }
-             return false;
-         }
+           function contains(a, obj) {
+               for (var i = 0; i < a.length; i++) {
+                   if (a[i] === obj) {
+                       return true;
+                   }
+               }
+               return false;
+           }
 
-         // Aux function used in commands such as ls
-         function get_filenames() {
-             names = [];
-             for(var j = 0; j < currentdir.items.length; j++) {
-                 names.push(currentdir.items[j].name);
-             }
-             return names;
-         }
+           // Aux function used in commands such as ls
+           function get_filenames() {
+               names = [];
+               for(var j = 0; j < currentdir.items.length; j++) {
+                   names.push(currentdir.items[j].name);
+               }
+               return names;
+           }
 
  
-         // Prototype to handle items in the 'filesystem'
-         function Item(name, size=sizepad(0), empty=false, data="", dir_b = false, owner = curuser(), group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
-             this.name = name; // The identifier of the item
-             this.empty = empty; 
-             this.size = sizepad(size); // The size, in bytes, of the item
-             this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
-             this.owner = owner; // Who owns this item? (Defaults to tomg.io)
-             this.group = group; // What group does this item belong to? (Defaults to user) 
-             // Access perms... 
-             this.owner_a = owner_a; // Owner - defaults to 7 
-             this.group_a = group_a; // Group - defaults to 4
-             this.other_a = other_a; // Other - defaults to 4
-
-             this.items = items; // If this is a directory, it might contain other items...
-             this.ts = ts;
-
-             this.data = data;
-         }
-         // Prototype to handle tomsh cmds
-         function Cmd(name, help="there is no help text for this command" , man="there is no manual for this command") {
-             this.name = name; // Identifier of the cmd
-             this.help = help; // Short help text for the cmd
-             this.man = man; // Full manual text for the cmd
-         }
-
-         // Mapping from users to an array of their groups
-         var users_groups = {
-             "visitor" : ["visitor", "user"],
-             "tomg.io" : ["owner", "user"]
-         }
-
-         // Mapping from access number to rwx combination
-         var access_map = {
-             "0" : "---",
-             "1" : "--x",
-             "2" : "-w-", 
-             "3" : "-wx", 
-             "4" : "r--", 
-             "5" : "r-x", 
-             "6" : "rw-", 
-             "7" : "rwx"
-         }
+           // Prototype to handle items in the 'filesystem'
+           function Item(name, size=sizepad(0), empty=false, data="", dir_b = false, owner = curuser(), group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
+               this.name = name; // The identifier of the item
+               this.empty = empty; 
+               this.size = sizepad(size); // The size, in bytes, of the item
+               this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
+               this.owner = owner; // Who owns this item? (Defaults to tomg.io)
+               this.group = group; // What group does this item belong to? (Defaults to user) 
+               // Access perms... 
+               this.owner_a = owner_a; // Owner - defaults to 7 
+               this.group_a = group_a; // Group - defaults to 4
+               this.other_a = other_a; // Other - defaults to 4
  
-         // Set these perms for original filesystem
-         var currentuser = "tomg.io";
+               this.items = items; // If this is a directory, it might contain other items...
+               this.ts = ts;
 
-         var CV = new Item("CV.pdf", "149051");
-         var Contact = new Item("contact.txt", "370");
-         var Edu = new Item("education.txt", "1337");
-         var Hey = new Item("hey.txt", "775");
-         // CONSTRUCT THE FILESYSTEM
-         var home = new Item("~", true);
+               this.data = data;
+           }
+           // Prototype to handle tomsh cmds
+           function Cmd(name, help="there is no help text for this command" , man="there is no manual for this command") {
+               this.name = name; // Identifier of the cmd
+               this.help = help; // Short help text for the cmd
+               this.man = man; // Full manual text for the cmd
+           }
 
-         home.items.push(Contact); // Put Contact.txt in the home directory.
-         home.items.push(CV); // Put our CV in the home directory.
-         home.items.push(Edu); 
-         home.items.push(Hey); 
+           // Mapping from users to an array of their groups
+           var users_groups = {
+               "visitor" : ["visitor", "user"],
+               "tomg.io" : ["owner", "user"]
+           }
 
-         // Keep track of which directory we're at! 
-         var currentdir = home;      
-         // Keep track of the filepath too
-         var filepath = ["~"];
-         // Keep track of the current user.   
-         currentuser = "visitor";
+           // Mapping from access number to rwx combination
+           var access_map = {
+               "0" : "---",
+               "1" : "--x",
+               "2" : "-w-", 
+               "3" : "-wx", 
+               "4" : "r--", 
+               "5" : "r-x", 
+               "6" : "rw-", 
+               "7" : "rwx"
+           }
+ 
+           // Set these perms for original filesystem
+           var currentuser = "tomg.io";
+
+           // CONSTRUCT THE FILESYSTEM
+           var CV = new Item("CV.pdf", "149051");
+           var Contact = new Item("contact.txt", "370");
+           var Edu = new Item("education.txt", "1337");
+           var Hey = new Item("hey.txt", "775");
+           var home = new Item("~", true);
+
+           home.items.push(Contact); // Put Contact.txt in the home directory.
+           home.items.push(CV); // Put our CV in the home directory.
+           home.items.push(Edu); 
+           home.items.push(Hey); 
+
+           // Keep track of which directory we're at! 
+           var currentdir = home;      
+           // Keep track of the filepath too
+           var filepath = ["~"];
+           // Keep track of the current user.   
+           currentuser = "visitor";
 
     
-         // DEFINE ALL OF THE AVAILABLE COMMANDS
-         const CMDS  = []     
-
-         const cat = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
-         const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
-         const exit   = new Cmd("exit", "close the tab\n usage: exit");
-         const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
-         const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
-         const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
-         const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
-         const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>\n STILL IN DEVELOPMENT - WILL NOT WORK!");
-         const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
+           // DEFINE ALL OF THE AVAILABLE COMMANDS
+           const CMDS  = []     
+  
+           const cat = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
+           const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
+           const exit   = new Cmd("exit", "close the tab\n usage: exit");
+           const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
+           const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
+           const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
+           const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
+           const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>\n STILL IN DEVELOPMENT - WILL NOT WORK!");
+           const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
  
-         CMDS.push(cat);
-         CMDS.push(evince);
-         CMDS.push(exit);
-         CMDS.push(groups);
-         CMDS.push(help); 
-         CMDS.push(ls);
-         CMDS.push(man);
-         CMDS.push(touch);
-         CMDS.push(mkdir);
+           CMDS.push(cat);
+           CMDS.push(evince);
+           CMDS.push(exit);
+           CMDS.push(groups);
+           CMDS.push(help); 
+           CMDS.push(ls);
+           CMDS.push(man);
+           CMDS.push(touch);
+           CMDS.push(mkdir);
 
-         // Regex to split input into command, flags and args
-         var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
+           // Regex to split input into command, flags and args
+           var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
         
-         // Regex to split args 
-         var args_split_re = /(".*"|\S*)*/;
+           // Regex to split args 
+           var args_split_re = /(".*"|\S*)*/;
  
-         var console1 = $('<div class="console1">');
-         $('body').append(console1);
-         var controller1 = console1.console({
+           var console1 = $('<div class="console1">');
+           $('body').append(console1);
+           var controller1 = console1.console({
            promptLabel: 'visitor@tomg.io:~$ ',
            commandValidate:function(line){
                 return true;
