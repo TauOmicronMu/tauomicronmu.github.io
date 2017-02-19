@@ -313,6 +313,34 @@
                if(args_b) return [ERROR.INVALID_ARGS_NUM, null]
                close();
                return [ERROR.COMMAND_NOT_SUPPORTED, null];
+           }
+  
+           // groups
+           // dependencies: 
+           function groups_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               var ret_str = "";
+               var groups = users_groups[currentuser];
+               for(var i = 0; i < groups.length; i++) ret_str += groups[i] + " ";
+               return [ERROR.NO_ERROR, ret_str]
+           }              
+
+           // help
+           // dependencies:
+           function help_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var ret_str = "";
+               if(!args_b) {
+                   ret_str += "here is a list of available commands - (use help <command> for details about them):\n";
+                   for(var i = 0; i < CMDS.length; i++) ret_str += CMDS[i].name + " ";
+                   return [ERROR.NO_ERROR, ret_str];
+               } 
+               var len = args_len();
+               if(length != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               // Return the help text from the provided command
+               for(var i = 0; i < CMDS.length; i++) if(args[0] == CMDS[i].name) return [ERROR.NO_ERROR, CMDS[i].help];
+               return [ERROR.INVALID_ARGS, null];             
            } 
 
            // ls
@@ -381,53 +409,33 @@
            // evince 
            function evince_c() {
                var evince = evince_a();
-               var len = args_len();
                if(evince_a[0] == ERROR.NO_ERROR) return return_message("evince: opening file, " + args[0]);
+               var len = args_len();
                return error_handler(evince[0], command, flags, args, "1", len, args); 
            } 
 
            // exit 
            function exit_c() {
                var exit = exit_a();
-               var len = args_len();
                if(evince_a[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
                return error_handler(exit[0], command, flags, args, "0", len);
            }
    
            // groups
            function groups_c() {
-               if(flags_b) return invalid_flags(command, flags);
-               var message = "";
-               var groups = users_groups[currentuser];
-               for(var i = 0; i < groups.length; i++) {
-                   message += groups[i] + " ";    
-               }
-               return return_message(message);
+               var groups = groups_a();
+               if(groups[0] == ERROR.NO_ERROR) return return_message(groups[1]);
+               var len = args_len();
+               return error_handler(groups[0], command, flags, args, "0", len);
            }
            
            // help
            function help_c() {
-               // If there are flags, throw the usual error
-               if(flags_b) return invalid_flags(command, flags);
-               var message = "";
-               // If there are no args, return a list of available commands
-               if(!args_b) {
-                   message += "here is a list of available commands - (use help <command> for details about them):\n";
-                   for(var i = 0; i < CMDS.length; i++) {
-                       message += CMDS[i].name + "  ";
-                   }
-                return return_message(message);
-               }
-               // If there is more or less than one arg, invalid number of args
-               var length = 0;
-               if(args_b) length = args.length;
-               if(length != 1) return invalid_args_num(command, length, 1);
-               // Otherwise, return the help message about the given command
-               for(var i = 0; i < CMDS.length; i++) {
-                   var name = CMDS[i].name;
-                   if(args[0] == name) return return_message(CMDS[i].help);
-               }
-               return invalid_args(command, args[0]);
+               var help = help_a();
+               if(help[0] == ERROR.NO_ERROR) return return_message(help[1]);
+               var len = args_len();
+               return error_handler(help[0], command, flags, args, ">2", len);
            }
            
            // ls
