@@ -311,16 +311,14 @@
            // cat
            // dependencies: 
            function cat_a() {
-               console.log(userperms("secret.txt"));
                // Error checking
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                if(!args_b) return [ERROR.INVALID_ARGS_NUM, null];
                var names = get_filenames();
                // Ensure all args are valid filepaths, and the user has read access on all of them
                for(var i = 0; i < args.length; i++) {
-                   var perms = userperms(args[i]);
                    if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null]; 
-                   if(!perms[0]) return [ERROR.PERMISSION_DENIED, null];
+                   if(!userperms(args[i])[0]) return [ERROR.PERMISSION_DENIED, null];
                }
                var ret_str = "";
                // Open each file, and concat
