@@ -259,7 +259,6 @@
            
            // cat
            // dependencies: touch
-           // TODO: touch the file.
            function cat_a() {
                // Error checking
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
@@ -282,13 +281,13 @@
                        xhttp.send(null);
                    }
                ret_str += "";
-               } 
+               touch(args[i]);
+               }
                return [ERROR.NO_ERROR, ret_str];
            }
 
-           // evince
+           // evince 
            // dependencies: touch
-           // TODO: touch the file.
            function evince_a() {
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                var len = args_len();
@@ -297,6 +296,7 @@
                for(var i = 0; i < currentdir.items.length; i++) {
                    var name = currentdir.items[i].name;
                    if(args[0] == name) {
+                       touch(name);
                        window.open(name);
                        return [ERROR.NO_ERROR, null];
                    } 
