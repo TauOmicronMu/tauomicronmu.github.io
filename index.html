@@ -106,11 +106,11 @@
            var currentuser = "tomg.io";
 
            // CONSTRUCT THE FILESYSTEM
-           var CV = new Item("CV.pdf", "149051");
+           var CV      = new Item("CV.pdf", "149051");
            var Contact = new Item("contact.txt", "370");
-           var Edu = new Item("education.txt", "1337");
-           var Hey = new Item("hey.txt", "775");
-           var home = new Item("~", true);
+           var Edu     = new Item("education.txt", "1337");
+           var Hey     = new Item("hey.txt", "775");
+           var home    = new Item("~", true);
 
            home.items.push(Contact); // Put Contact.txt in the home directory.
            home.items.push(CV); // Put our CV in the home directory.
@@ -234,7 +234,7 @@
                return [{msg: command + ": invalid number of arguments, "+ args_num + ", expected " + args_num_e, className:"jquery-console-message-value"}]; 
            }
            var invalid_filepath = function(command, filepath) {
-               return [{msg: command + ": invalid filepath, "+ filepath, className:"jquery-console-message-value"}];
+               return [{msg: command + ": invalid filepath(s), "+ filepath, className:"jquery-console-message-value"}];
            }
            var return_message = function(msg) {
                return [{msg:msg,className:"jquery-console-message-value"}];
@@ -328,7 +328,9 @@
                var cat = cat_a();
                if(cat[0] == ERROR.NO_ERROR) return return_message(cat[1]);
                // TODO: account for the right errors
-               return error_handler(cat[0], command, flags, args, 0);
+               var len = args_len();
+               if(len > 0) return error_handler(cat[0], command, flags, args, 0, len, args);
+               return error_handler(cat[0], command, flags, args, 0, len);
            }
 
            // evince 
@@ -391,7 +393,6 @@
                var length = 0;
                if(args_b) length = args.length;
                if(length != 1) return invalid_args_num(command, length, 1);
-               console.log(CMDS);
                // Otherwise, return the help message about the given command
                for(var i = 0; i < CMDS.length; i++) {
                    var name = CMDS[i].name;
@@ -403,7 +404,6 @@
            // ls
            function ls_c() {
                var ls = ls_a();
-               console.log(ls);
                if(ls[0] == ERROR.NO_ERROR) return return_message(ls[1]);
                return error_handler(ls[0], command, flags, args, 0); 
            }
