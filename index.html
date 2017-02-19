@@ -150,7 +150,7 @@
 
            // Regex to split input into command, flags and args
            var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
-        
+           
            // Regex to split args 
            var args_split_re = /(".*"|\S*)*/;
  
@@ -230,6 +230,9 @@
 
            
            // DEFINE BEHAVIOUR OF EACH AVAILABLE COMMAND
+           // TODO: Actually do checks on access permissions
+           // TODO: Update timestamps when you use a file outside of touch.
+
 
            // cat
            function cat_c() { 
