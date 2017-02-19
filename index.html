@@ -49,6 +49,16 @@
                return false;
            }
 
+           // Returns the item with the specified name from the current directory
+           // (or null if it doesn't exist).
+           function item_from_name(fn) {
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var item = currentdir.items[i];
+                   if(item.name == fn) return item;
+               } 
+               return null;
+           }
+
            // Aux function used in commands such as ls
            function get_filenames() {
                names = [];
@@ -121,11 +131,13 @@
            var Edu     = new Item("education.txt", "1337");
            var Hey     = new Item("hey.txt", "775");
            var home    = new Item("~", true);
+           var secret  = new Item("secret.txt", sizepad(0), true, "", false, "tomg.io", "user", "6", "0", "0");
 
            home.items.push(Contact); // Put Contact.txt in the home directory.
            home.items.push(CV); // Put our CV in the home directory.
            home.items.push(Edu); 
            home.items.push(Hey); 
+           home.items.push(secret);
 
            // Keep track of which directory we're at! 
            var currentdir = home;      
@@ -134,26 +146,26 @@
            // Keep track of the current user.   
            currentuser = "visitor";
    
-           // What permissions does the current user have for a given item on the
-           // filesystem? returns [bool, bool, bool], corresponding to [r, w, x].
-           function user_perms_on_item(item) {
+           function userperms(i) {
+               var i = item_from_name(i);
                var user_groups = users_groups[currentuser];
-               var perms;
+               var perms = 0;
                var owner_perms = false;
                var group_perms = false;
-               if(contains(user_groups, item.owner)) {
-                   perms = item.owner_a;
+               if(contains(user_groups, i.owner)) {
+                   perms = i.owner_a;
                    owner_perms = true;
                }
-               if(contains(user_groups, item.group)) {
-                   if(owner_perms) perms = max(item.owner_a, item.group_a);
-                   else            perms = item.group_a;
+               if(contains(user_groups, i.group)) {
+                   if(owner_perms) perms = max(i.owner_a, i.group_a);
+                   else            perms = i.group_a;
                    group_perms = true;
                }
-               if(!(owner_perms || group_perms)) perms = item.other_a;
+               if(!(owner_perms || group_perms)) perms = i.other_a;
                return access_bool_map[perms];
            } 
 
+ 
            // DEFINE ALL OF THE AVAILABLE COMMANDS
            const CMDS  = []     
   
@@ -190,7 +202,7 @@
            commandValidate:function(line){
                 return true;
            },
-           commandHandle:function(line){
+           commandHandle:function(line) {
            // split the input into command, flags and args
            var split_line = line.split(split_re);      
            if(split_line.length <= 1) return [{msg:"",className:"jquery-console-message-value"}];
@@ -231,6 +243,7 @@
                }
                args_b = true;
            }
+
  
            if(args) {
                // remove surrounding quotes
@@ -262,7 +275,9 @@
            var invalid_filepath = function(command, filepath) {
                return [{msg: command + ": invalid filepath(s), "+ filepath, className:"jquery-console-message-value"}]; }
            var command_not_supported = function(command) {
-               return [{msg: "the " + command + " command is not supported by your browser", className:"jquery-console-message-value"}]; }
+               return [{msg: command + ": command not supported by your browser", className:"jquery-console-message-value"}]; }
+           var permission_denied = function(command, filepath) {
+               return [{msg: command + ": permission denied, " + filepath, className:"jquery-console-message-value"}]; }
            var return_message = function(msg) { 
                return [{msg:msg,className:"jquery-console-message-value"}]; }
 
@@ -274,6 +289,7 @@
                INVALID_ARGS_NUM      : 3,
                INVALID_FILEPATH      : 4,
                COMMAND_NOT_SUPPORTED : 5,
+               PERMISSION_DENIED     : 6,
            }
 
            function error_handler(code, command, flags, args, args_num_e, args_num=args_len(), filepath="") {
@@ -282,6 +298,7 @@
                if(code == ERROR.INVALID_ARGS_NUM)      return invalid_args_num      (command, args_num, args_num_e);
                if(code == ERROR.INVALID_FILEPATH)      return invalid_filepath      (command, filepath);
                if(code == ERROR.COMMAND_NOT_SUPPORTED) return command_not_supported (command);
+               if(code == ERROR.PERMISSION_DENIED)     return permission_denied     (command, filepath);
                return return_message("");
            }
 
@@ -292,12 +309,17 @@
            // cat
            // dependencies: 
            function cat_a() {
+               console.log(userperms("secret.txt"));
                // Error checking
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                if(!args_b) return [ERROR.INVALID_ARGS_NUM, null];
                var names = get_filenames();
-               // Ensure all args are valid filepaths.
-               for(var i = 0; i < args.length; i++) if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null]; 
+               // Ensure all args are valid filepaths, and the user has read access on all of them
+               for(var i = 0; i < args.length; i++) {
+                   var perms = userperms(args[i]);
+                   if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null]; 
+                   if(!perms[0]) return [ERROR.PERMISSION_DENIED, null];
+               }
                var ret_str = "";
                // Open each file, and concat
                for(var i = 0; i < args.length; i++) {
@@ -323,6 +345,7 @@
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                var len = args_len();
                if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               if(!userperms(args[0])[0]) return [ERROR.PERMISSION_DENIED, null];
                // TOOD: check if we're opening a non-empty file...
                for(var i = 0; i < currentdir.items.length; i++) {
                    var name = currentdir.items[i].name;
