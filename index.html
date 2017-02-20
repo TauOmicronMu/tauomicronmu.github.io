@@ -280,6 +280,8 @@
                return [{msg: command + ": command not supported by your browser", className:"jquery-console-message-value"}]; }
            var permission_denied = function(command, filepath) {
                return [{msg: command + ": permission denied, " + filepath, className:"jquery-console-message-value"}]; }
+           var cannot_delete_dir = function(command, filepath) {
+               return [{msg: command + ": cannot remove '" + filepath + "': Is a directory", className:"jquery-console-message-value"}]; } 
            var return_message = function(msg) { 
                return [{msg:msg,className:"jquery-console-message-value"}]; }
 
@@ -292,6 +294,7 @@
                INVALID_FILEPATH      : 4,
                COMMAND_NOT_SUPPORTED : 5,
                PERMISSION_DENIED     : 6,
+               CANNOT_DELETE_DIR     : 7,
            }
 
            function error_handler(code, command, flags, args, args_num_e, args_num=args_len(), filepath="") {
@@ -301,6 +304,7 @@
                if(code == ERROR.INVALID_FILEPATH)      return invalid_filepath      (command, filepath);
                if(code == ERROR.COMMAND_NOT_SUPPORTED) return command_not_supported (command);
                if(code == ERROR.PERMISSION_DENIED)     return permission_denied     (command, filepath);
+               if(code == ERROR.CANNOT_DELETE_DIR)     return cannot_delete_dir     (command, filepath);
                return return_message("");
            }
 
@@ -438,6 +442,7 @@
                return [ERROR.INVALID_ARGS, null];
            }
 
+           // TODO: Check if we can write in this dir.
            // mkdir
            // dependencies :
            function mkdir_a() {
@@ -458,6 +463,7 @@
                var names = get_filenames();
                if(!contains(names, args[0])) return [ERROR.INVALID_ARGS, null];
                if(!userperms(args[0])[1]) return [ERROR.PERMISSION_DENIED, null];
+               if(item_from_name(args[0]).dir_b) return [ERROR.CANNOT_DELETE_DIR, null];
                currentdir.items.splice(currentdir.items.indexOf(args[0]),1);
                return [ERROR.NO_ERROR, null]; 
            }
