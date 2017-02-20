@@ -445,8 +445,7 @@
                var len = args_len();
                if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
                var names = get_filenames();
-               if(!contains(names, args[0])) return [ERROR.INVALID_ARGS, null];
-               currentdir.items.push(new Item(args[0],true, true));
+               currentdir.items.push(new Item(args[0], sizepad(0), true, "", true));
                return [ERROR.NO_ERROR, null];
            }
 
