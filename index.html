@@ -540,7 +540,7 @@
                var help = help_a();
                if(help[0] == ERROR.NO_ERROR) return return_message(help[1]);
                var len = args_len();
-               return error_handler(help[0], command, flags, args, ">2", len);
+               return error_handler(help[0], command, flags, args, "<2", len);
            }
            
            // ls
