@@ -394,6 +394,10 @@
                return [ERROR.INVALID_ARGS, null];             
            } 
 
+           // TODO: sort by alphabetical name at the start of each ls. 
+           //       this way, we only ever sort when the user wants to
+           //       see the items, which means we don't waste time sorting
+           //       at every insertion etc.
            // ls
            // dependencies: 
            function ls_a() { 
@@ -402,7 +406,7 @@
                    ret_str = "";
                    var fns = get_filenames(); 
                    for(var i = 0; i < fns.length; i++) {
-                       ret_str += fns[i] + "  ";
+                       ret_str += fns[i] + " ";
                    }
                    return [ERROR.NO_ERROR, ret_str];
                }
@@ -432,6 +436,18 @@
                    if(cmd.name == args[0]) return [ERROR.NO_ERROR, cmd.man];
                }
                return [ERROR.INVALID_ARGS, null];
+           }
+
+           // mkdir
+           // dependencies :
+           function mkdir_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               var names = get_filenames();
+               if(!contains(names, args[0])) return [ERROR.INVALID_ARGS, null];
+               currentdir.items.push(new Item(args[0],true, true));
+               return [ERROR.NO_ERROR, null];
            }
 
            // rm
@@ -529,6 +545,14 @@
                return error_handler(man[0], command, flags, args, "1", len);
            }
 
+           // mkdir
+           function mkdir_c() {
+               var mkdir = mkdir_a();
+               if(mkdir[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
+               return error_handler(mkdir[0], command, flags, args, "1", len);
+           }
+
            // rm 
            function rm_c() {
                var rm = rm_a();
@@ -553,8 +577,9 @@
            if(command == "help")   return help_c();
            if(command == "ls")     return ls_c();
            if(command == "man")    return man_c();
+           if(command == "mkdir")  return mkdir_c();
            if(command == "rm")     return rm_c();
-           if(command == "touch")  return touch_c(); 
+           if(command == "touch")  return touch_c();
            // catches any unknown commands
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
            },
