@@ -179,6 +179,7 @@
            const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>\n STILL IN DEVELOPMENT - WILL NOT WORK!");
            const rm     = new Cmd("rm", "removes a given file from the current directory.\nusage: rm <name>\n");
            const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
+           const whoami = new Cmd("whoami", "show the current user\n usage: whoami");
  
            CMDS.push(cat);
            CMDS.push(evince);
@@ -190,6 +191,7 @@
            CMDS.push(mkdir);
            CMDS.push(rm);
            CMDS.push(touch);
+           CMDS.push(whoami);
 
            // Regex to split input into command, flags and args
            var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
@@ -491,6 +493,12 @@
                return [ERROR.NO_ERROR, ""];
            }
 
+           function whoami_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               return [ERROR.NO_ERROR, curuser];
+           }           
+
            // DEFINE COMMANDS
            // TODO: Actually do checks on access permissions
 
@@ -574,6 +582,14 @@
                return error_handler(touch[0], command, flags, args, "0 or 1", len, args);
            }
  
+           // whoami
+           function whoami_c() {
+               var whoami = whoami_a();
+               if(whoami[0] == ERROR.NO_ERROR) return return_message(whoami[1]);
+               var len = args_len();
+               return error_handler(whoami[0], command, flags, args, "0", len);
+           }
+ 
            // EXECUTE COMMANDS
            if(command == "cat")    return cat_c();
            if(command == "evince") return evince_c();
@@ -585,6 +601,7 @@
            if(command == "mkdir")  return mkdir_c();
            if(command == "rm")     return rm_c();
            if(command == "touch")  return touch_c();
+           if(command == "whoami") return whoami_c();
            // catches any unknown commands
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
            },
