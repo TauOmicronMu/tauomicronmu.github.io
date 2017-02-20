@@ -350,8 +350,8 @@
            function evince_a() {
                if(flags_b) return [ERROR.INVALID_FLAGS, null];
                var len = args_len();
-               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
-               if(!contains(get_filenames, args[0])) return [ERROR.INVALID_ARGS, null];
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null]; 
+               if(!contains(get_filenames(), args[0])) return [ERROR.INVALID_ARGS, null];
                if(!userperms(args[0])[0]) return [ERROR.PERMISSION_DENIED, null];
                // TOOD: check if we're opening a non-empty file...
                for(var i = 0; i < currentdir.items.length; i++) {
