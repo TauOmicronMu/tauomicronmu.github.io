@@ -629,22 +629,16 @@
            },
            completeHandle: function(line) {
 
-               function clone(a) {
-                   
-               }
-
                function autocomp(str, opts) {
                    // For every letter in str, eliminate any opt
                    // that doesn't have that as the 1st letter and
                    // then remove the 1st letter of each remaining 
                    // command.
                    var arr = opts.splice(0);
-                   console.log(arr);
+                   for(var i = 0; i < arr.length; i++) arr[i] = arr[i] + " "; // Add a space to the end
                    for(var i = 0; i < str.length; i++) {
-                       console.log("loop #" + i);
                        var i_letter = str[i];
                        for(var j = 0; j < arr.length; j++) {
-                           console.log(i_letter + " == " + arr[j][i]);
                            if(i_letter == arr[j][0]) arr[j] = arr[j].substring(1);
                            else arr[j] = " ";
                        }
