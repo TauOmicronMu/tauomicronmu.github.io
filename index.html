@@ -272,7 +272,6 @@
            commandHandle:function(line) {
            
            p_line = parseline(line);
-           console.log(p_line);
            command = p_line[0];
            flags_b = p_line[1];
            flags =  p_line[2];
@@ -646,19 +645,12 @@
                        var i_letter = str[i];
                        for(var j = 0; j < arr.length; j++) {
                            console.log(i_letter + " == " + arr[j][i]);
-                           if(i_letter == arr[j][i]) {
-                               console.log("true");
-                               arr[j] = arr[j].substring(1);
-                               console.log(arr[j]);
-                           } 
-                           else {
-                               arr[j] = "";
-                           }
+                           if(i_letter == arr[j][0]) arr[j] = arr[j].substring(1);
+                           else arr[j] = " ";
                        }
                    }
-                   // Remove all ""s from the array
-                   arr = arr.filter(function(x) {return x != "";});
-                   console.log(arr);
+                   // Remove all " "s from the array
+                   arr = arr.filter(function(x) {return x != " ";});
                    return arr;
                }
  
