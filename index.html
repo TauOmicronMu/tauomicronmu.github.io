@@ -658,16 +658,10 @@
                var cmds = get_cmds();
 
                if(p_line.length <= 1) return cmds;
-
-               var x = autocomp(command, cmds);         
-
-               console.log(x);
-
-               // We only have a command at this point
-               if(!(flags_b && args_b)) return x; 
-
-               return ["TEST"];
- 
+               if(flags_b && !args_b) return [];
+               if(!args_b) return autocomp(command, cmds); 
+               if(args_b) return autocomp(args[args.length-1], get_filenames());
+               return []; // No autocompletions were found 
            },
            autofocus:true,
            animateScroll:true,
