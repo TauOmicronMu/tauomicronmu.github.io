@@ -61,12 +61,18 @@
 
            // Aux function used in commands such as ls
            function get_filenames() {
-               names = [];
-               for(var j = 0; j < currentdir.items.length; j++) {
-                   names.push(currentdir.items[j].name);
-               }
+               var names = [];
+               for(var i = 0; i < currentdir.items.length; i++) names.push(currentdir.items[i].name);
                return names;
            }
+
+          function get_cmds() {
+              var ret = []
+              for(var i = 0; i < CMDS.length; i++ ) {
+                  ret.push(CMDS[i].name);
+              }
+              return ret;
+          }
 
            // Prototype to handle items in the 'filesystem'
            function Item(name, size=sizepad(0), empty=false, data="", dir_b = false, owner = curuser(), group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
@@ -167,7 +173,7 @@
 
  
            // DEFINE ALL OF THE AVAILABLE COMMANDS
-           const CMDS  = []     
+           var CMDS  = []     
   
            const cat    = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
            const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
@@ -623,6 +629,39 @@
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
            },
            completeHandle: function(line) {
+
+               function clone(a) {
+                   
+               }
+
+               function autocomp(str, opts) {
+                   // For every letter in str, eliminate any opt
+                   // that doesn't have that as the 1st letter and
+                   // then remove the 1st letter of each remaining 
+                   // command.
+                   var arr = opts.splice(0);
+                   console.log(arr);
+                   for(var i = 0; i < str.length; i++) {
+                       console.log("loop #" + i);
+                       var i_letter = str[i];
+                       for(var j = 0; j < arr.length; j++) {
+                           console.log(i_letter + " == " + arr[j][i]);
+                           if(i_letter == arr[j][i]) {
+                               console.log("true");
+                               arr[j] = arr[j].substring(1);
+                               console.log(arr[j]);
+                           } 
+                           else {
+                               arr[j] = "";
+                           }
+                       }
+                   }
+                   // Remove all ""s from the array
+                   arr = arr.filter(function(x) {return x != "";});
+                   console.log(arr);
+                   return arr;
+               }
+ 
                p_line = parseline(line);
                command = p_line[0];
                flags_b = p_line[1];
@@ -630,13 +669,19 @@
                args_b = p_line[3];
                args = p_line[4];
 
-               ret = [];
+               var cmds = get_cmds();
 
-               cmdnames = [];
-                
-               console.log(line);
-  
-               return ret;
+               if(p_line.length <= 1) return cmds;
+
+               var x = autocomp(command, cmds);         
+
+               console.log(x);
+
+               // We only have a command at this point
+               if(!(flags_b && args_b)) return x; 
+
+               return ["TEST"];
+ 
            },
            autofocus:true,
            animateScroll:true,
