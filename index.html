@@ -199,6 +199,62 @@
            // Regex to split args 
            var args_split_re = /(".*"|\S*)*/;
 
+           function parseline(line) {
+	       var split_line = line.split(split_re);      
+	       if(split_line.length <= 1) return [{msg:"",className:"jquery-console-message-value"}];
+
+	       // TODO: Deal with &&, ||, | etc.
+  
+	       // grab the command
+	       var command_b = false;
+	       var command;
+	       if(split_line.length >= 1) {
+	           command = split_line[1];
+	           command_b = true;
+	       }
+ 
+	       // Now grab the flags
+	       var flags_b = false;
+	       var flags;
+	       if(split_line[2] != undefined) {
+	           flags = split_line[2]; //TODO: Make this less naive
+	           flags_b = true;
+               }
+    
+	       // Now grab the args
+	       var args_b = false;
+	       var args;
+	       if(split_line[4] != undefined) {
+	           args = split_line[4].split(args_split_re);
+	           // Splice "" and " " from the array
+	           var index = args.indexOf("");
+	           while(index > -1) {
+	               args.splice(index, 1);
+	               index = args.indexOf("");
+	           }
+	           index = args.indexOf(" ");
+	           while(index > -1) {
+	               args.splice(index, 1);
+	               index = args.indexOf(" ");
+	           }
+	           args_b = true;
+	       }
+
+ 
+	       if(args) {
+	           // remove surrounding quotes
+	           for(var i = 0; i < args.length; i++) {
+	               var arg = args[i];
+	               if(arg != undefined) {
+	                   if(arg.slice(0,1) == '"' && arg.slice(args.length-1,args.length) == '"') args[i] = arg.slice(1,arg.length -1);
+	               }
+	           }
+	       }
+
+               return [command, flags_b, flags, args_b, args];
+           }
+
+           // DEFINE THE CONSOLE
            var console1 = $('<div class="console1">');
            $('body').append(console1);
            var controller1 = console1.console({
@@ -206,59 +262,16 @@
            commandValidate:function(line){
                 return true;
            },
+           // HANDLE A COMMAND
            commandHandle:function(line) {
-           // split the input into command, flags and args
-           var split_line = line.split(split_re);      
-           if(split_line.length <= 1) return [{msg:"",className:"jquery-console-message-value"}];
-
-           // TODO: Deal with &&, ||, | etc.
- 
-           // grab the command
-           var command_b = false;
-           var command;
-           if(split_line.length >= 1) {
-               command = split_line[1];
-               command_b = true;
-           }
- 
-           // Now grab the flags
-           var flags_b = false;
-           var flags;
-           if(split_line[2] != undefined) {
-               flags = split_line[2]; //TODO: Make this less naive
-               flags_b = true;
-	   }
-    
-           // Now grab the args
-           var args_b = false;
-           var args;
-           if(split_line[4] != undefined) {
-               args = split_line[4].split(args_split_re);
-               // Splice "" and " " from the array
-               var index = args.indexOf("");
-               while(index > -1) {
-                   args.splice(index, 1);
-                   index = args.indexOf("");
-               }
-               index = args.indexOf(" ");
-               while(index > -1) {
-                   args.splice(index, 1);
-                   index = args.indexOf(" ");
-               }
-               args_b = true;
-           }
-
- 
-           if(args) {
-               // remove surrounding quotes
-               for(var i = 0; i < args.length; i++) {
-                   var arg = args[i];
-                   if(arg != undefined) {
-                       if(arg.slice(0,1) == '"' && arg.slice(args.length-1,args.length) == '"') args[i] = arg.slice(1,arg.length -1);
-                   }
-               }
-           }
-         
+           
+           p_line = parseline(line);
+           console.log(p_line);
+           command = p_line[0];
+           flags_b = p_line[1];
+           flags =  p_line[2];
+           args_b = p_line[3];
+           args = p_line[4];
           
            // Returns the number of arguments being passed to the current command.
            function args_len() {
@@ -314,6 +327,9 @@
            // FUNCTIONALITY OF EACH COMMAND. 
            // Each returns : [RETURN_CODE, RESULT]
            
+           // Just do a newline if we don't have a command
+           if(p_line.length <= 1) return return_message("");
+
            // cat
            // dependencies: 
            function cat_a() {
@@ -605,6 +621,22 @@
            if(command == "whoami") return whoami_c();
            // catches any unknown commands
            return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
+           },
+           completeHandle: function(line) {
+               p_line = parseline(line);
+               command = p_line[0];
+               flags_b = p_line[1];
+               flags =  p_line[2];
+               args_b = p_line[3];
+               args = p_line[4];
+
+               ret = [];
+
+               cmdnames = [];
+                
+               console.log(line);
+  
+               return ret;
            },
            autofocus:true,
            animateScroll:true,
