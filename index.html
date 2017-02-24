@@ -176,18 +176,20 @@
            var CMDS  = []     
   
            const cat    = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
+           const echo   = new Cmd("echo", "display a line of text");
            const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
            const exit   = new Cmd("exit", "close the tab\n usage: exit");
            const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
            const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
            const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
            const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
-           const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>\n STILL IN DEVELOPMENT - WILL NOT WORK!");
+           const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>");
            const rm     = new Cmd("rm", "removes a given file from the current directory.\nusage: rm <name>\n");
            const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
            const whoami = new Cmd("whoami", "show the current user\n usage: whoami");
  
            CMDS.push(cat);
+           CMDS.push(echo);
            CMDS.push(evince);
            CMDS.push(exit);
            CMDS.push(groups);
@@ -366,6 +368,14 @@
                return [ERROR.NO_ERROR, ret_str];
            }
 
+           // echo
+           // dependencies: 
+           function echo_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_len() != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               return [ERROR.NO_ERROR, args[0]];
+           }
+
            // evince 
            // dependencies:
            function evince_a() {
@@ -533,6 +543,13 @@
                return error_handler(cat[0], command, flags, args, ">0", len);
            }
 
+           // echo
+           function echo_c() {
+               var echo = echo_a();
+               if(echo[0] == ERROR.NO_ERROR) return return_message(echo[1]);
+               return error_handler(echo[0], command, flags, args, "1", args_len(), args);
+           }
+
            // evince 
            function evince_c() {
                var evince = evince_a();
@@ -614,6 +631,7 @@
  
            // EXECUTE COMMANDS
            if(command == "cat")    return cat_c();
+           if(command == "echo")   return echo_c();
            if(command == "evince") return evince_c();
            if(command == "exit")   return exit_c();
            if(command == "groups") return groups_c();
