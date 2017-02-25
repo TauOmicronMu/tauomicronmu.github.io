@@ -176,6 +176,7 @@
            var CMDS  = []     
   
            const cat    = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
+           const chmod  = new Cmd("chmod", "change file mode bits\nusage: chmod <mode> <file>");
            const echo   = new Cmd("echo", "display a line of text\n usage: echo <text>");
            const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
            const exit   = new Cmd("exit", "close the tab\n usage: exit");
@@ -189,6 +190,7 @@
            const whoami = new Cmd("whoami", "show the current user\n usage: whoami");
  
            CMDS.push(cat);
+           CMDS.push(chmod);
            CMDS.push(echo);
            CMDS.push(evince);
            CMDS.push(exit);
@@ -368,6 +370,28 @@
                return [ERROR.NO_ERROR, ret_str];
            }
 
+           // chmod
+           // dependencies:
+           function chmod_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_len() != 2) return [ERROR.INVALID_ARGS_NUM, null];
+               var mod = args[0];
+               var fn = args[1]; 
+               var fns = get_filenames();
+               if(!contains(fns, fn)) return [ERROR.INVALID_FILEPATH, null];
+               var f = item_from_name(fn);
+               if(!contains(users_groups[curuser()], f.owner)) return [ERROR.PERMISSION_DENIED, null];
+               if(mod.length != 3) return [ERROR.INVALID_ARGS, null];
+               var valid_args = ["0", "1", "2", "3", "4", "5", "6", "7"];
+               for(var i = 0; i < mod.length; i++) {
+                   if(!contains(valid_args, mod[i])) return [ERROR.INVALID_ARGS, null];
+               }
+               f.owner_a = mod[0];
+               f.group_a = mod[1];
+               f.other_a = mod[2]; 
+               return [ERROR.NO_ERROR, null];
+           }
+
            // echo
            // dependencies: 
            function echo_a() {
@@ -532,7 +556,6 @@
            }           
 
            // DEFINE COMMANDS
-           // TODO: Actually do checks on access permissions
 
            // cat
            function cat_c() {
@@ -541,6 +564,13 @@
                var len = args_len();
                if(len > 0) return error_handler(cat[0], command, flags, args, ">0", len, args);
                return error_handler(cat[0], command, flags, args, ">0", len);
+           }
+
+           // chmod
+           function chmod_c() {
+               var chmod = chmod_a();
+               if(chmod[0] == ERROR.NO_ERROR) return return_message("");
+               return error_handler(chmod[0], command, flags, args, "2", args_len(), args);
            }
 
            // echo
@@ -631,6 +661,7 @@
  
            // EXECUTE COMMANDS
            if(command == "cat")    return cat_c();
+           if(command == "chmod")  return chmod_c();
            if(command == "echo")   return echo_c();
            if(command == "evince") return evince_c();
            if(command == "exit")   return exit_c();
