@@ -1,75 +1,788 @@
 <!doctype html>
 <html>
+  <head>
+    <title>$ tomsh</title>
+    <meta name="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="jquery.console.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+           const MAX_FILESIZE_LENGTH = 6;
+
+           // Return the current user
+           function curuser() { return currentuser; }
+
+           // Return whether or not a file is empty
+           function isEmpty(filename) {
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var item = currentdir.items[i];
+                   if(item.name == filename) {
+                       return item.empty;
+                   }
+               }
+               return true; // I guess?
+           }
+
+           // Get current timestamp in correct format
+           function timestamp() {
+               var c_ts = (new Date(Date.now())).toString();
+               var c_ts_split = c_ts.split(" ");
+               return c_ts_split[1] + " " + c_ts_split[2] + " " + c_ts_split[4];    
+           }
+
+           function sizepad(s) {
+               var pad_n = MAX_FILESIZE_LENGTH - s.length;
+               var padding = "";
+               if(pad_n == 0) return s;
+               for(var i = 0; i < pad_n; i++) {
+                   padding += " ";
+               }
+               return padding + s;
+           }
+        
+           function contains(a, obj) {
+               for (var i = 0; i < a.length; i++) {
+                   if (a[i] === obj) {
+                       return true;
+                   }
+               }
+               return false;
+           }
+ 
+           // Returns the item with the specified name from the current directory
+           // (or null if it doesn't exist).
+           function item_from_name(fn) {
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var item = currentdir.items[i];
+                   if(item.name == fn) return item;
+               } 
+               return null;
+           }
+
+           // Aux function used in commands such as ls
+           function get_filenames() {
+               var names = [];
+               for(var i = 0; i < currentdir.items.length; i++) names.push(currentdir.items[i].name);
+               return names;
+           }
+
+          function get_cmds() {
+              var ret = []
+              for(var i = 0; i < CMDS.length; i++ ) {
+                  ret.push(CMDS[i].name);
+              }
+              return ret;
+          }
+
+           // Prototype to handle items in the 'filesystem'
+           function Item(name, size=sizepad(0), empty=false, data="", dir_b = false, owner = curuser(), group = "user", owner_a = "6", group_a = "4", other_a = "4", items = [],  ts=timestamp()) {
+               this.name = name; // The identifier of the item
+               this.empty = empty; 
+               this.size = sizepad(size); // The size, in bytes, of the item
+               this.dir_b = dir_b; // Is this item a directory? (Defaults to false)
+               this.owner = owner; // Who owns this item? (Defaults to tomg.io)
+               this.group = group; // What group does this item belong to? (Defaults to user) 
+               // Access perms... 
+               this.owner_a = owner_a; // Owner - defaults to 7 
+               this.group_a = group_a; // Group - defaults to 4
+               this.other_a = other_a; // Other - defaults to 4
+ 
+               this.items = items; // If this is a directory, it might contain other items...
+               this.ts = ts;
+
+               this.data = data;
+           }
+           // Prototype to handle tomsh cmds
+           function Cmd(name, help="there is no help text for this command" , man="there is no manual for this command") {
+               this.name = name; // Identifier of the cmd
+               this.help = help; // Short help text for the cmd
+               this.man = man; // Full manual text for the cmd
+           }
+
+           // Mapping from users to an array of their groups
+           var users_groups = {
+               "visitor" : ["visitor", "user"],
+               "tomg.io" : ["owner", "user"]
+           }
+
+           // Mapping from access number to rwx combination
+           var access_map = {
+               "0" : "---",
+               "1" : "--x",
+               "2" : "-w-", 
+               "3" : "-wx", 
+               "4" : "r--", 
+               "5" : "r-x", 
+               "6" : "rw-", 
+               "7" : "rwx"
+           }
+
+           var access_bool_map = {
+               "0" : [false, false, false],
+               "1" : [false, false, true],
+               "2" : [false, true, false],
+               "3" : [false, true, true],
+               "4" : [true, false, false],
+               "5" : [true, false, true],
+               "6" : [true, true, false],
+               "7" : [true, true, true]
+           }
+ 
+           // Set these perms for original filesystem
+           var currentuser = "tomg.io";
+
+           // CONSTRUCT THE FILESYSTEM
+           var CV      = new Item("CV.pdf", "149051");
+           var Contact = new Item("contact.txt", "370");
+           var Edu     = new Item("education.txt", "1337");
+           var Hey     = new Item("hey.txt", "775");
+           var home    = new Item("~", true);
+           var secret  = new Item("secret.txt", "82", false, "", false, "tomg.io", "user", "6", "0", "0");
+
+           home.items.push(Contact); // Put Contact.txt in the home directory.
+           home.items.push(CV); // Put our CV in the home directory.
+           home.items.push(Edu); 
+           home.items.push(Hey); 
+           home.items.push(secret);
+
+           // Keep track of which directory we're at! 
+           var currentdir = home;      
+           // Keep track of the filepath too
+           var filepath = ["~"];
+           // Keep track of the current user.   
+           currentuser = "visitor";
+   
+           function userperms(i) {
+               var i = item_from_name(i);
+               var user_groups = users_groups[currentuser];
+               var perms = 0;
+               var owner_perms = false;
+               var group_perms = false;
+               if(contains(user_groups, i.owner)) {
+                   perms = i.owner_a;
+                   owner_perms = true;
+               }
+               if(contains(user_groups, i.group)) {
+                   if(owner_perms) perms = Math.max(i.owner_a, i.group_a);
+                   else            perms = i.group_a;
+                   group_perms = true;
+               }
+               if(!(owner_perms || group_perms)) perms = i.other_a;
+               return access_bool_map[perms];
+           } 
+
+ 
+           // DEFINE ALL OF THE AVAILABLE COMMANDS
+           var CMDS  = []     
   
-<head>
-      <link href='https://fonts.googleapis.com/css?family=Quicksand:400,300,700' rel='stylesheet' type='text/css'>
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css">
-      <style>
+           const cat    = new Cmd("cat", "concatenate files and print them to standard output\nusage: cat <file 1> <file 2>...");
+           const chmod  = new Cmd("chmod", "change file mode bits\nusage: chmod <mode> <file>");
+           const echo   = new Cmd("echo", "display a line of text\n usage: echo <text>");
+           const evince = new Cmd("evince", "open a pdf file in a new tab\n usage: evince <filepath>");
+           const exit   = new Cmd("exit", "close the tab\n usage: exit");
+           const groups = new Cmd("groups", "list the groups that you belong to\nusage: groups");
+           const help   = new Cmd("help", "list all available commands, or provide a description of a given command\n usage: help <command>");
+           const ls     = new Cmd("ls", "list all items in the current directory\nusage: ls <flags>\n type 'man ls' for more details");
+           const man    = new Cmd("man", "shows the manual for a given command\n usage: man <command>");
+           const mkdir  = new Cmd("mkdir", "creates a directory with the given name in the current directory.\nusage: mkdir <name>");
+           const rm     = new Cmd("rm", "removes a given file from the current directory.\nusage: rm <name>\n");
+           const touch  = new Cmd("touch", "change file timestamps\n usage: touch <file>");     
+           const whoami = new Cmd("whoami", "show the current user\n usage: whoami");
+ 
+           CMDS.push(cat);
+           CMDS.push(chmod);
+           CMDS.push(echo);
+           CMDS.push(evince);
+           CMDS.push(exit);
+           CMDS.push(groups);
+           CMDS.push(help); 
+           CMDS.push(ls);
+           CMDS.push(man);
+           CMDS.push(mkdir);
+           CMDS.push(rm);
+           CMDS.push(touch);
+           CMDS.push(whoami);
+
+           // Regex to split input into command, flags and args
+           var split_re = /\s*(\S+)\s?((-{1,2}\S*\s?)*)*\s?("?.*"?\s?)*/
+           
+           // Regex to split args 
+           var args_split_re = /(".*"|\S*)*/;
+
+           function parseline(line) {
+	       var split_line = line.split(split_re);      
+	       if(split_line.length <= 1) return [{msg:"",className:"jquery-console-message-value"}];
+
+	       // TODO: Deal with &&, ||, | etc.
+  
+	       // grab the command
+	       var command_b = false;
+	       var command;
+	       if(split_line.length >= 1) {
+	           command = split_line[1];
+	           command_b = true;
+	       }
+ 
+	       // Now grab the flags
+	       var flags_b = false;
+	       var flags;
+	       if(split_line[2] != undefined) {
+	           flags = split_line[2]; //TODO: Make this less naive
+	           flags_b = true;
+               }
+    
+	       // Now grab the args
+	       var args_b = false;
+	       var args;
+	       if(split_line[4] != undefined) {
+	           args = split_line[4].split(args_split_re);
+	           // Splice "" and " " from the array
+	           var index = args.indexOf("");
+	           while(index > -1) {
+	               args.splice(index, 1);
+	               index = args.indexOf("");
+	           }
+	           index = args.indexOf(" ");
+	           while(index > -1) {
+	               args.splice(index, 1);
+	               index = args.indexOf(" ");
+	           }
+	           args_b = true;
+	       }
+
+ 
+	       if(args) {
+	           // remove surrounding quotes
+	           for(var i = 0; i < args.length; i++) {
+	               var arg = args[i];
+	               if(arg != undefined) {
+	                   if(arg.slice(0,1) == '"' && arg.slice(args.length-1,args.length) == '"') args[i] = arg.slice(1,arg.length -1);
+	               }
+	           }
+	       }
+
+               return [command, flags_b, flags, args_b, args];
+           }
+
+           // DEFINE THE CONSOLE
+           var console1 = $('<div class="console1">');
+           $('body').append(console1);
+           var controller1 = console1.console({
+           promptLabel: 'visitor@tomg.io:~$ ',
+           commandValidate:function(line){
+                return true;
+           },
+           // HANDLE A COMMAND
+           commandHandle:function(line) {
+           
+           p_line = parseline(line);
+           command = p_line[0];
+           flags_b = p_line[1];
+           flags =  p_line[2];
+           args_b = p_line[3];
+           args = p_line[4];
+          
+           // Returns the number of arguments being passed to the current command.
+           function args_len() {
+               length = 0;
+               if(args_b) length = args.length;
+               return length;
+           }
+
+           // ERROR HANDLING
+
+           // Common error messages 
+           var invalid_flags = function(command, flags) {
+               return [{msg:command + ": invalid option: " + flags,className:"jquery-console-message-value"}]; }
+           var invalid_args = function(command, args) {
+               return [{msg: command + ": invalid args: " + args,className:"jquery-console-message-value"}]; }
+           var invalid_args_num = function(command, args_num, args_num_e) {
+               return [{msg: command + ": invalid number of arguments, "+ args_num + ", expected " + args_num_e, className:"jquery-console-message-value"}]; }
+           var invalid_filepath = function(command, filepath) {
+               return [{msg: command + ": invalid filepath(s), "+ filepath, className:"jquery-console-message-value"}]; }
+           var command_not_supported = function(command) {
+               return [{msg: command + ": command not supported by your browser", className:"jquery-console-message-value"}]; }
+           var permission_denied = function(command, filepath) {
+               return [{msg: command + ": permission denied, " + filepath, className:"jquery-console-message-value"}]; }
+           var cannot_delete_dir = function(command, filepath) {
+               return [{msg: command + ": cannot remove '" + filepath + "': Is a directory", className:"jquery-console-message-value"}]; } 
+           var return_message = function(msg) { 
+               return [{msg:msg,className:"jquery-console-message-value"}]; }
+
+           // ERRORS ENUM
+           var ERROR = {
+               NO_ERROR              : 0,    
+               INVALID_FLAGS         : 1,
+               INVALID_ARGS          : 2,
+               INVALID_ARGS_NUM      : 3,
+               INVALID_FILEPATH      : 4,
+               COMMAND_NOT_SUPPORTED : 5,
+               PERMISSION_DENIED     : 6,
+               CANNOT_DELETE_DIR     : 7,
+           }
+
+           function error_handler(code, command, flags, args, args_num_e, args_num=args_len(), filepath="") {
+               if(code == ERROR.INVALID_FLAGS)         return invalid_flags         (command, flags);
+               if(code == ERROR.INVALID_ARGS)          return invalid_args          (command, args);
+               if(code == ERROR.INVALID_ARGS_NUM)      return invalid_args_num      (command, args_num, args_num_e);
+               if(code == ERROR.INVALID_FILEPATH)      return invalid_filepath      (command, filepath);
+               if(code == ERROR.COMMAND_NOT_SUPPORTED) return command_not_supported (command);
+               if(code == ERROR.PERMISSION_DENIED)     return permission_denied     (command, filepath);
+               if(code == ERROR.CANNOT_DELETE_DIR)     return cannot_delete_dir     (command, filepath);
+               return return_message("");
+           }
+
+           // DEFINE AUXILIARY FUNCTIONS THAT ENCAPSULATE 
+           // FUNCTIONALITY OF EACH COMMAND. 
+           // Each returns : [RETURN_CODE, RESULT]
+           
+           // Just do a newline if we don't have a command
+           if(p_line.length <= 1) return return_message("");
+
+           // cat
+           // dependencies: 
+           function cat_a() {
+               // Error checking
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(!args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               var names = get_filenames();
+               // Ensure all args are valid filepaths, and the user has read access on all of them
+               for(var i = 0; i < args.length; i++) {
+                   if(!contains(names, args[i])) return [ERROR.INVALID_FILEPATH, null]; 
+                   if(!userperms(args[i])[0]) return [ERROR.PERMISSION_DENIED, null];
+               }
+               var ret_str = "";
+               // Open each file, and concat
+               for(var i = 0; i < args.length; i++) {
+                   // In this case, grab the file
+                   if(!isEmpty(args[i])) {
+                       var xhttp = new XMLHttpRequest();
+                       xhttp.open("GET", args[i], false);
+                       xhttp.onreadystatechange = function() {
+                           if((xhttp.readyState == 4) && (xhttp.status == 200 || xhttp.status == 0)) {
+                               ret_str += xhttp.responseText;
+                           }
+                       }
+                       xhttp.send(null);
+                   }
+               ret_str += "";
+               }
+               return [ERROR.NO_ERROR, ret_str];
+           }
+
+           // chmod
+           // dependencies:
+           function chmod_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_len() != 2) return [ERROR.INVALID_ARGS_NUM, null];
+               var mod = args[0];
+               var fn = args[1]; 
+               var fns = get_filenames();
+               if(!contains(fns, fn)) return [ERROR.INVALID_FILEPATH, null];
+               var f = item_from_name(fn);
+               if(!contains(users_groups[curuser()], f.owner)) return [ERROR.PERMISSION_DENIED, null];
+               if(mod.length != 3) return [ERROR.INVALID_ARGS, null];
+               var valid_args = ["0", "1", "2", "3", "4", "5", "6", "7"];
+               for(var i = 0; i < mod.length; i++) {
+                   if(!contains(valid_args, mod[i])) return [ERROR.INVALID_ARGS, null];
+               }
+               f.owner_a = mod[0];
+               f.group_a = mod[1];
+               f.other_a = mod[2]; 
+               return [ERROR.NO_ERROR, null];
+           }
+
+           // echo
+           // dependencies: 
+           function echo_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_len() != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               return [ERROR.NO_ERROR, args[0]];
+           }
+
+           // evince 
+           // dependencies:
+           function evince_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null]; 
+               if(!contains(get_filenames(), args[0])) return [ERROR.INVALID_ARGS, null];
+               if(!userperms(args[0])[0]) return [ERROR.PERMISSION_DENIED, null];
+               // TOOD: check if we're opening a non-empty file...
+               for(var i = 0; i < currentdir.items.length; i++) {
+                   var name = currentdir.items[i].name;
+                   if(args[0] == name) {
+                       window.open(name);
+                       return [ERROR.NO_ERROR, null];
+                   } 
+               }
+               return [ERROR.INVALID_FILEPATH, null];
+           }
+
+           // exit
+           // dependencies: 
+           function exit_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null]
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null]
+               close();
+               return [ERROR.COMMAND_NOT_SUPPORTED, null];
+           }
+  
+           // groups
+           // dependencies: 
+           function groups_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               var ret_str = "";
+               var groups = users_groups[currentuser];
+               for(var i = 0; i < groups.length; i++) ret_str += groups[i] + " ";
+               return [ERROR.NO_ERROR, ret_str]
+           }              
+
+           // help
+           // dependencies:
+           function help_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var ret_str = "";
+               if(!args_b) {
+                   ret_str += "here is a list of available commands - (use help <command> for details about them):\n";
+                   for(var i = 0; i < CMDS.length; i++) ret_str += CMDS[i].name + " ";
+                   return [ERROR.NO_ERROR, ret_str];
+               } 
+               var len = args_len();
+               if(length != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               // Return the help text from the provided command
+               for(var i = 0; i < CMDS.length; i++) if(args[0] == CMDS[i].name) return [ERROR.NO_ERROR, CMDS[i].help];
+               return [ERROR.INVALID_ARGS, null];             
+           } 
+
+           // TODO: sort by alphabetical name at the start of each ls. 
+           //       this way, we only ever sort when the user wants to
+           //       see the items, which means we don't waste time sorting
+           //       at every insertion etc.
+           // ls
+           // dependencies: 
+           function ls_a() { 
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               if(!flags_b) {
+                   ret_str = "";
+                   var fns = get_filenames(); 
+                   for(var i = 0; i < fns.length; i++) {
+                       ret_str += fns[i] + "  ";
+                   }
+                   return [ERROR.NO_ERROR, ret_str];
+               }
+               if(flags == "-l") {
+                   var ret_str = "";
+                   for(var i = 0; i < currentdir.items.length; i++) {
+                       var item = currentdir.items[i];
+                       if(item.dir_b) ret_str += "d";
+                       else ret_str += "-";
+                       ret_str += access_map[item.owner_a] + access_map[item.group_a] + access_map[item.other_a] + " "; // Access perms
+                       ret_str += "1 "; // Number of links
+                       ret_str += item.owner + " " + item.group + " " + item.size + " " + item.ts + " " + item.name + "\n";
+                   }
+                   return [ERROR.NO_ERROR, ret_str];
+               }
+               return [ERROR.INVALID_FLAGS, null];
+           } 
+
+           // man
+           // dependencies :
+           function man_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               for(var i = 0; i < CMDS.length; i++) {
+                   var cmd = CMDS[i];
+                   if(cmd.name == args[0]) return [ERROR.NO_ERROR, cmd.man];
+               }
+               return [ERROR.INVALID_ARGS, null];
+           }
+
+           // TODO: Check if we can write in this dir.
+           // mkdir
+           // dependencies :
+           function mkdir_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               var names = get_filenames();
+               currentdir.items.push(new Item(args[0], sizepad(0), true, "", true));
+               return [ERROR.NO_ERROR, null];
+           }
+
+           // rm
+           // dependencies :
+           function rm_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len != 1) return [ERROR.INVALID_ARGS_NUM, null];
+               var names = get_filenames();
+               if(!contains(names, args[0])) return [ERROR.INVALID_ARGS, null];
+               if(!userperms(args[0])[1]) return [ERROR.PERMISSION_DENIED, null];
+               if(item_from_name(args[0]).dir_b) return [ERROR.CANNOT_DELETE_DIR, null];
+               currentdir.items.splice(currentdir.items.indexOf(args[0]),1);
+               return [ERROR.NO_ERROR, null]; 
+           }
+   
+           // touch
+           // dependencies: 
+           function touch(fn) {
+               if(!contains(get_filenames(), fn)) currentdir.items.push(new Item(fn, sizepad(0), true));
+               else {
+                   for(var i = 0; i < currentdir.items.length; i++) {
+                       var item = currentdir.items[i]; 
+                       if(fn == item.name) {
+                           currentdir.items[i].ts = timestamp();
+                           return ERROR.NO_ERROR;
+                       }
+                   }
+               }
+               return ERROR.NO_ERROR;
+           }
+           function touch_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               var len = args_len();
+               if(len > 1 || len == 0) return [ERROR.INVALID_ARGS_NUM, null];
+               touch(args[0]);
+               return [ERROR.NO_ERROR, ""];
+           }
+
+           function whoami_a() {
+               if(flags_b) return [ERROR.INVALID_FLAGS, null];
+               if(args_b) return [ERROR.INVALID_ARGS_NUM, null];
+               return [ERROR.NO_ERROR, curuser];
+           }           
+
+           // DEFINE COMMANDS
+
+           // cat
+           function cat_c() {
+               var cat = cat_a();
+               if(cat[0] == ERROR.NO_ERROR) return return_message(cat[1]);
+               var len = args_len();
+               if(len > 0) return error_handler(cat[0], command, flags, args, ">0", len, args);
+               return error_handler(cat[0], command, flags, args, ">0", len);
+           }
+
+           // chmod
+           function chmod_c() {
+               var chmod = chmod_a();
+               if(chmod[0] == ERROR.NO_ERROR) return return_message("");
+               return error_handler(chmod[0], command, flags, args, "2", args_len(), args);
+           }
+
+           // echo
+           function echo_c() {
+               var echo = echo_a();
+               if(echo[0] == ERROR.NO_ERROR) return return_message(echo[1]);
+               return error_handler(echo[0], command, flags, args, "1", args_len(), args);
+           }
+
+           // evince 
+           function evince_c() {
+               var evince = evince_a();
+               if(evince_a[0] == ERROR.NO_ERROR) return return_message("evince: opening file, " + args[0]);
+               var len = args_len();
+               return error_handler(evince[0], command, flags, args, "1", len, args); 
+           } 
+
+           // exit 
+           function exit_c() {
+               var exit = exit_a();
+               if(evince_a[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
+               return error_handler(exit[0], command, flags, args, "0", len);
+           }
+   
+           // groups
+           function groups_c() {
+               var groups = groups_a();
+               if(groups[0] == ERROR.NO_ERROR) return return_message(groups[1]);
+               var len = args_len();
+               return error_handler(groups[0], command, flags, args, "0", len);
+           }
+           
+           // help
+           function help_c() {
+               var help = help_a();
+               if(help[0] == ERROR.NO_ERROR) return return_message(help[1]);
+               var len = args_len();
+               return error_handler(help[0], command, flags, args, "<2", len);
+           }
+           
+           // ls
+           function ls_c() {
+               var ls = ls_a();
+               if(ls[0] == ERROR.NO_ERROR) return return_message(ls[1]);
+               return error_handler(ls[0], command, flags, args, 0); 
+           }
         
-        body {
-          background-color: #dddddd;
-          height: 100%;
-          width: 100%;
-          padding: 0px;
-          margin: 0px;
-          color: #fff;
-          font-family: Quicksand, sans-serif;
-          background: url(img/cityscape.jpg) no-repeat center center fixed; 
-         -webkit-background-size: cover;
-          -moz-background-size: cover;
-          -o-background-size: cover;
-          background-size: cover;
-          text-align: center;
-        }
-        
-        h1 {
-          font-size: 3vw;
-        }
+           // man
+           function man_c() {
+               var man = man_a();
+               if(man[0] == ERROR.NO_ERROR) return return_message(man[1]);
+               var len = args_len();
+               return error_handler(man[0], command, flags, args, "1", len);
+           }
+
+           // mkdir
+           function mkdir_c() {
+               var mkdir = mkdir_a();
+               if(mkdir[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
+               return error_handler(mkdir[0], command, flags, args, "1", len);
+           }
+
+           // rm 
+           function rm_c() {
+               var rm = rm_a();
+               if(rm[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
+               return error_handler(rm[0], command, flags, args, "1", len, args);
+           }
+           
+           // touch
+           function touch_c() {
+               var touch = touch_a();
+               if(touch[0] == ERROR.NO_ERROR) return return_message("");
+               var len = args_len();
+               return error_handler(touch[0], command, flags, args, "0 or 1", len, args);
+           }
+ 
+           // whoami
+           function whoami_c() {
+               var whoami = whoami_a();
+               if(whoami[0] == ERROR.NO_ERROR) return return_message(whoami[1]);
+               var len = args_len();
+               return error_handler(whoami[0], command, flags, args, "0", len);
+           }
+ 
+           // EXECUTE COMMANDS
+           if(command == "cat")    return cat_c();
+           if(command == "chmod")  return chmod_c();
+           if(command == "echo")   return echo_c();
+           if(command == "evince") return evince_c();
+           if(command == "exit")   return exit_c();
+           if(command == "groups") return groups_c();
+           if(command == "help")   return help_c();
+           if(command == "ls")     return ls_c();
+           if(command == "man")    return man_c();
+           if(command == "mkdir")  return mkdir_c();
+           if(command == "rm")     return rm_c();
+           if(command == "touch")  return touch_c();
+           if(command == "whoami") return whoami_c();
+           // catches any unknown commands
+           return [{msg:"tomsh: " + command + ": command not found",className:"jquery-console-message-value"}];
+           },
+           completeHandle: function(line) {
+
+               function autocomp(str, opts) {
+                   // For every letter in str, eliminate any opt
+                   // that doesn't have that as the 1st letter and
+                   // then remove the 1st letter of each remaining 
+                   // command.
+                   var arr = opts.splice(0);
+                   for(var i = 0; i < arr.length; i++) arr[i] = arr[i] + " "; // Add a space to the end
+                   for(var i = 0; i < str.length; i++) {
+                       var i_letter = str[i];
+                       for(var j = 0; j < arr.length; j++) {
+                           if(i_letter == arr[j][0]) arr[j] = arr[j].substring(1);
+                           else arr[j] = " ";
+                       }
+                   }
+                   // Remove all " "s from the array
+                   arr = arr.filter(function(x) {return x != " ";});
+                   return arr;
+               }
+ 
+               p_line = parseline(line);
+               command = p_line[0];
+               flags_b = p_line[1];
+               flags =  p_line[2];
+               args_b = p_line[3];
+               args = p_line[4];
+
+               var cmds = get_cmds();
+
+               if(p_line.length <= 1) return cmds;
+               if(flags_b && !args_b) return [];
+               if(!args_b) return autocomp(command, cmds); 
+               if(args_b) return autocomp(args[args.length-1], get_filenames());
+               return []; // No autocompletions were found 
+           },
+           autofocus:true,
+           animateScroll:true,
+           promptHistory:true,
+           welcomeMessage: 
+`
+   
+  \\ \\   \\ \\     | |                             | |    
+   \\ \\   \\ \\    | |_    ___    _ __ ___    ___  | |__  
+    > >   > >   | __|  / _ \\  | '_ \` _ \\  / __| | '_ \\ 
+   / /   / /    | |_  | (_) | | | | | | | \\__ \\ | | | |
+  /_/   /_/      \\__|  \\___/  |_| |_| |_| |___/ |_| |_|
+
+       Welcome to 'tom shell' (tomsh) - I'm Tom Goodman, and this is
+   my personal website! tomsh works almost like a restricted subset
+   of bash, so try what you can! If you manage to break it, (please
+   try! :D) let me know and I'll do my best to deploy a fix ASAP <3
        
-        h2 {
-          font-size: 2vw;
-          text-align: justified;
-          margin: auto;
-        }
-      
-        .hover-button {
-            color: #fff;
-            font-size: 2vw;
-            padding: 5px;
-         }
-
-        a {
-          color: #fff;
-        }
-        
-         body i {
-              transition: all ease 0.3s;
-         }
-
-         body i:hover {
-             font-size: 3vw;
-        
-        #about {
-          text-align: center !important;
-          width: 100%;
-        }
-      </style>
-</head>
-
+       If you need some help, type 'help', and you should be gucci. (If not,
+   type 'evince CV.pdf' to open my CV!). Quick hint, 'Ctrl + l' will clear
+   the screen (including this!).
+       
+       Enjoy! And let me know what you think!
+                                              ~Tom - @TauOmicronMu
+`,
+           });
+        });
+    </script>
+    
+    <style>
+      console1 {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+    <style type="text/css" media="screen">
+      body {
+          top: 0;
+          left: 0;
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+          overflow-y: hidden;
+          background: #333;
+      }
+      .jquery-console-inner .jquery-console-message { white-space: pre;}
+      div.console1 { word-wrap: break-word; }
+      div.console1 { font-size: 14px }
+      div.console1 { padding-right: 5%; }
+     
+      div.console1 div.jquery-console-inner
+       { width:100vw; height:98vh; background:#333; padding:0.5em;
+         overflow:auto }
+      div.console1 div.jquery-console-prompt-box
+       { color:#fff; font-family:monospace; }
+      div.console1 div.jquery-console-focus span.jquery-console-cursor
+       { background:#fefefe; color:#333; font-weight:bold }
+      div.console1 div.jquery-console-message-error
+       { color:#ef0505; font-family:sans-serif; font-weight:bold;
+         padding:0.1em; }
+      div.console1 div.jquery-console-message-value
+       { color:#1ad027; font-family:monospace;
+         padding:0.1em; }
+      div.console1 div.jquery-console-message-type
+       { color:#52666f; font-family:monospace;
+         padding:0.1em; }
+      div.console1 span.jquery-console-prompt-label { font-weight:bold }
+      div.jquery-console-welcome { text-align: center; color: #1ad027; font-family:monospace }
+    </style>
+  </head>
   <body>
-      <section id="about">
-            <h1>Tom Goodman 
-                <br>
-                <span style="color:#696A6F; font-size:2vw">Student, Developer Evangelist & Hackathon Organiser</span>
-            </h1>
-            <h2 style="width: 40%">
-              Hi, I'm Tom! I'm a student at the University of Birmingham and a Developer Evangelist. Check <a href="CV.pdf">here</a> for my CV, and click below for everything else!
-            </h2>
-            <h2>
-              <a class="hover-button" href="https://twitter.com/tauomicronmu/"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-              <a class="hover-button" href="https://github.com/tauomicronmu"><i class="fa fa-github" aria-hidden="true"></i></a>
-              <a class="hover-button" href="https://uk.linkedin.com/in/tagoodman"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-            </h2>
-      </section>
-</body>
+  </body>
 </html>
