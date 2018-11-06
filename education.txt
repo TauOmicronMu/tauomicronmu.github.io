@@ -1,5 +1,29 @@
-MSci Computer Science - University of Birmingham
-------------------------------------------------
+BSc Computer Science - University of Birmingham - First Class Honours (77% Average)
+------------------------------------------------------------------------------------
+Third Year - 79% Overall
+Top Modules: 
+|----------------------- |------------|
+|   Module               |   Grade    |
+|----------------------- |------------|
+| Dissertation           |    86%     |
+|----------------------- |------------| 
+| Principles of          |    80%     |
+| Programming Languages  |            |
+|----------------------- |------------|
+| Mobile & Ubiquitous    |    77%     |
+|         Computing      |            |
+|----------------------- |------------|
+Second Year - 72% Overall
+Top Modules: 
+|----------------------- |------------|
+|   Module               |   Grade    |
+|----------------------- |------------|
+| C/C++                  |    85%     |
+|----------------------- |------------| 
+| Reasoning              |    78%     |
+|----------------------- |------------|
+| Functional Programming |    78%     |
+|----------------------- |------------|
 First Year - 81% Overall
 Top Modules: 
 |----------------------|------------|
