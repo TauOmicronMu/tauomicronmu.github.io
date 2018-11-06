@@ -1,6 +1,7 @@
 ----------------------------------------------------------
-                 Thomas Goodman AMBCS
- MSci Computer Science Student - University of Birmingham
+        Thomas Goodman BSc (Hons) B'ham FRSA FBS
+         Office 218, School of Computer Science
+       Phd Researcher - University of Birmingham
                    +44 7719 819 480 
                      @TauOmicronMu
             http://github.com/tauomicronmu
