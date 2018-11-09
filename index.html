@@ -138,12 +138,14 @@
            var Hey     = new Item("hey.txt", "775");
            var home    = new Item("~", true);
            var secret  = new Item("secret.txt", "82", false, "", false, "tomg.io", "user", "6", "0", "0");
+           var isspit1 = new Item("isspit-1.pdf", "454121");
 
            home.items.push(Contact); // Put Contact.txt in the home directory.
            home.items.push(CV); // Put our CV in the home directory.
            home.items.push(Edu); 
            home.items.push(Hey); 
            home.items.push(secret);
+           home.items.push(isspit1);
 
            // Keep track of which directory we're at! 
            var currentdir = home;      
