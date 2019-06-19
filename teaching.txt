@@ -1,0 +1,35 @@
+2018/19 - Project Students
+---------------------------
+>> Greg Field (MSc Computer Science) - Feature-based Reccomendation of Music for Playlists
+>> Bryn Lansdown (MSc Computer Science) - Multi-modal Music Classification for Genre Analysis
+
+
+2018/19 - Spring Semester
+--------------------------
+>> Reasoning - Teaching Associate/Assistant Lecturer
+>> Team Project - Teaching Associate
+>> Mobile and Ubiquitous Computing - Teaching Associate
+
+2018/19 - Autumn Semester
+--------------------------
+>> MSc/ICY Software Workshop (Java) - Teaching Associate
+
+2017/18 - Spring Semester
+--------------------------
+>> Software Workshop (Java) - Demonstrator
+
+2017/18 - Autumn Semester
+--------------------------
+>> Software Workshop (Java) - Demonstrator
+
+2016/17 - Spring Semester
+--------------------------
+>> Software Workshop (Java) - Demonstrator
+
+2016/17 - Autumn Semester
+--------------------------
+>> Software Workshop (Java) - Demonstrator
+
+2015/16 - Autumn Semester
+--------------------------
+>> Introduction to Functional Programming (OCaml) - Peer Demonstrator
