@@ -1,9 +1,24 @@
 
+2020/21 - Autumn Semester
+---------------------------
+>> Mathematical and Logical Foundations of Computer Science - Teaching Fellow
+>> Advanced Networking - Teaching Fellow
+>> Functional Programming - Teaching Fellow
+
+2019/20 - Spring Semester
+---------------------------
+>> Mobile and Ubiquitous Computing - Teaching Fellow 
+>> Team Project - Teaching Fellow
+
+2019/20 - Autumn Semester
+---------------------------
+>> Operating Systems - Teaching Fellow
+>> Concepts of Computer Science - Teaching Fellow
+
 2018/19 - Project Students
 ---------------------------
 >> Greg Field (MSc Computer Science) - Feature-based Reccomendation of Music for Playlists
 >> Bryn Lansdown (MSc Computer Science) - Multi-modal Music Classification for Genre Analysis
-
 
 2018/19 - Spring Semester
 --------------------------
