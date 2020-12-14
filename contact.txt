@@ -1,9 +1,8 @@
-----------------------------------------------------------
-        Thomas Goodman BSc (Hons) B'ham FRSA FBS MBCS
-         Office 218, School of Computer Science
-       Phd Researcher - University of Birmingham
-                   +44 7719 819 480 
-                     @TauOmicronMu
-            http://github.com/tauomicronmu
-              Birmingham, United Kingdom
-----------------------------------------------------------
+------------------------------------------------------------------
+   Tom Goodman BSc (Hons) B'ham SFHEA FRSA FBS MBCS MCCT MRi
+           Office 218, School of Computer Science
+      Doctoral Researcher - University of Birmingham
+                       @TauOmicronMu
+              http://github.com/tauomicronmu
+                Birmingham, United Kingdom
+-------------------------------------------------------------------
