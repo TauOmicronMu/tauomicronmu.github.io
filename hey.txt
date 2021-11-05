@@ -1,7 +1,8 @@
   Hey! I'm Tom! 
-  I'm a Software Developer/Engineer, Event Organiser, Analyst and Developer Evangelist with prior industry experience. 
-  I'm currently pursuing my PhD in Computer Science at the University of Birmingham, and my topic is signal processing of acoustic musical signals.  
-Now we've gotten that out of the way (I know it was a bit of a mouthful...)
+I'm a postdoctoral researcher at the University of Warwick, working on mathematical modelling for the ARME project, 
+  and on markerless motion tracking. I'm also the founder of HackTheMidlands, and a huge fan of the Birmingham
+  tech community! :) 
+  Now we've gotten that out of the way (I know it was a bit of a mouthful...)
   I'm also a keen musician (pianist & singer), and really enjoy both performing and composing in my spare time. 
   I've spent far too long already on this site, and I keep getting nerd sniped by people who are suggesting 
 cool things to implement... like vim... and vim... ...
