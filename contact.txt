@@ -1,8 +1,15 @@
-------------------------------------------------------------------
-   Tom Goodman BSc (Hons) B'ham SFHEA FRSA FBS MBCS MCCT MRi
-           Office 218, School of Computer Science
-      Doctoral Researcher - University of Birmingham
+---------------------------------------------------------------------
+    Tom Goodman BSc (Hons) B'ham SFHEA FRSA FBS FBCS MCCT MRi MRCN 
+     
+               Postdoctoral Researcher 
+        Pod 2, Institute for Digital Healthcare  
+            International Digital Laboratory 
+               WMG, University of Warwick 
+
+          Office 218, School of Computer Science
+       Doctoral Researcher - University of Birmingham
+          
                        @TauOmicronMu
-              http://github.com/tauomicronmu
-                Birmingham, United Kingdom
--------------------------------------------------------------------
+               http://github.com/tauomicronmu
+                 Birmingham, United Kingdom
+---------------------------------------------------------------------
