@@ -1,9 +1,7 @@
   Hey! I'm Tom! 
-I'm a postdoctoral researcher at the University of Warwick, working on mathematical modelling for the ARME project, 
-  and on markerless motion tracking. I'm also the founder of HackTheMidlands, and a huge fan of the Birmingham
-  tech community! :) 
-  Now we've gotten that out of the way (I know it was a bit of a mouthful...)
+I'm a senior software engineering consultant at CGI (formerly BJSS). I'm also one of the organisers of 
+TechMids, the founder of HackTheMidlands, and a huge fan of the Birmingham tech community! :) 
   I'm also a keen musician (pianist & singer), and really enjoy both performing and composing in my spare time. 
   I've spent far too long already on this site, and I keep getting nerd sniped by people who are suggesting 
 cool things to implement... like vim... and vim... ...
-  If you're reading this - say hey! Chuck me a message on Twitter - I'm @TauOmicronMu! 
+  If you're reading this - say hey! Chuck me a message on Twitter - I'm @TauOmicronMu, or LinkedIn (tagoodman)! 
