@@ -1,14 +1,6 @@
 ---------------------------------------------------------------------
-    Tom Goodman BSc (Hons) B'ham SFHEA FRSA FBS FBCS MCCT MRi MRCN 
-     
-               Postdoctoral Researcher 
-        Pod 2, Institute for Digital Healthcare  
-            International Digital Laboratory 
-               WMG, University of Warwick 
+            Dr Tom Goodman BEM SFHEA FRSA FBS FBCS       
 
-          Office 218, School of Computer Science
-       Doctoral Researcher - University of Birmingham
-          
                        @TauOmicronMu
                http://github.com/tauomicronmu
                  Birmingham, United Kingdom
